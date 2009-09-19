@@ -45,18 +45,6 @@ void init_gl(void) {
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);			/* GL_TRUE */
 
-/*	glEnable(GL_LIGHTING);	*/
-
-	glEnable(GL_TEXTURE_2D);
-
-/* alpha channel transparency */
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-/* not needed
-	glEnable(GL_ALPHA_TEST);
-	glAlphaFunc(GL_GREATER, 0.1f);
-*/
 	glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
 	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 
@@ -64,7 +52,6 @@ void init_gl(void) {
 
 /* simply always turn this on */
 	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 
 void handle_keypress(int key) {
@@ -105,7 +92,9 @@ void create_window(void) {
 	SDK_max_videomode(&max_xres, &max_yres);
 
 	screen_width = max_xres * 0.6f;
-	screen_height = screen_width * 0.2f;
+	screen_height = screen_width * 0.4f;
+
+	SDK_window_hints(SDL_NOFRAME);
 
 	if (SDK_create_window(screen_width, screen_height, 0, "mpflow") < 0) {
 		fprintf(stderr, "error: failed to create window\n");
@@ -163,6 +152,31 @@ SDL_Surface *img;
 	SDL_FreeSurface(img);
 }
 
+/*
+	draw white frame around window
+*/
+void draw_frame(void) {
+GLfloat vertex_arr[8] = {
+	0, 0,
+	ARENA_WIDTH, 0,
+	ARENA_WIDTH, ARENA_HEIGHT,
+	0, ARENA_HEIGHT
+};
+
+	glDisable(GL_TEXTURE_2D);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+
+	glPolygonMode(GL_FRONT, GL_LINE);
+
+	glColor4f(1, 1, 1, 1);
+	glLineWidth(4.0f);
+
+	glVertexPointer(2, GL_FLOAT, 0, vertex_arr);
+	glDrawArrays(GL_QUADS, 0, 4);
+
+	glPolygonMode(GL_FRONT, GL_FILL);
+}
+
 void draw_cover(void) {
 GLfloat vertex_arr[8];
 GLfloat tex_arr[8] = {
@@ -180,6 +194,7 @@ GLfloat tex_arr[8] = {
 	vertex_arr[4] = vertex_arr[6] = COVER_H;
 
 	glEnable(GL_TEXTURE_2D);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	glBindTexture(GL_TEXTURE_2D, textures[0]);
 
 	glVertexPointer(2, GL_FLOAT, 0, vertex_arr);
@@ -190,6 +205,8 @@ GLfloat tex_arr[8] = {
 void draw(void) {
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
+
+	draw_frame();
 
 	glTranslatef((ARENA_WIDTH - COVER_W) * 0.5f, (ARENA_HEIGHT - COVER_H) * 0.5f, 0.0f);
 	draw_cover();
