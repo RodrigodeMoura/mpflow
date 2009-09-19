@@ -18,7 +18,7 @@ int max_xres = 320, max_yres = 200;		/* maximum display resolution (as reported 
 
 int key_down = 0;
 
-GLuint textures[10];
+GLuint textures[11];
 
 
 void draw(void);
@@ -253,7 +253,8 @@ GLfloat tex_reflect[8] = {
 }
 
 void draw(void) {
-float center_x, center_y;
+float center_x, center_y, pos;
+int n;
 
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
@@ -263,18 +264,28 @@ float center_x, center_y;
 	center_y = ARENA_HEIGHT * 0.5f;
 
 /* left side */
-	glPushMatrix();
-	glTranslatef(center_x - COVER_W, center_y, -50);
-	glRotatef(60.0f, 0, 1, 0);
-	draw_cover();
-	glPopMatrix();
+	pos = center_x - COVER_W * 1.4f;
+	for(n = 0; n < 5; n++) {
+		glPushMatrix();
+		glTranslatef(pos, center_y, -50);
+		glRotatef(60.0f, 0, 1, 0);
+		draw_cover();
+		glPopMatrix();
+
+		pos += (COVER_W * 0.125f);
+	}
 
 /* right side */
-	glPushMatrix();
-	glTranslatef(center_x + COVER_W, center_y, -50);
-	glRotatef(-60.0f, 0, 1, 0);
-	draw_cover();
-	glPopMatrix();
+	pos = center_x + COVER_W * 1.4f;
+	for(n = 0; n < 5; n++) {
+		glPushMatrix();
+		glTranslatef(pos, center_y, -50);
+		glRotatef(-60.0f, 0, 1, 0);
+		draw_cover();
+		glPopMatrix();
+
+		pos -= (COVER_W * 0.125f);
+	}
 
 /* center cover */
 	glPushMatrix();
