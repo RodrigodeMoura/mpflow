@@ -5,7 +5,7 @@
 #ifndef MAIN_H_WJ109
 #define MAIN_H_WJ109	1
 
-#define ARENA_WIDTH		800
+#define ARENA_WIDTH		500
 #define ARENA_HEIGHT	100
 #define Z_FAR			100
 

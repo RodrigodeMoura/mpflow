@@ -20,6 +20,8 @@ int key_down = 0;
 GLuint textures[10];
 
 
+void draw(void);
+
 
 void init_gl(void) {
 	glMatrixMode(GL_PROJECTION);
@@ -90,6 +92,10 @@ void window_event(SDK_Event event, int w, int h) {
 			SDK_exit(0);
 			break;
 
+		case SDK_EXPOSE:
+			draw();
+			break;
+
 		default:
 			;
 	}
@@ -99,7 +105,7 @@ void create_window(void) {
 	SDK_max_videomode(&max_xres, &max_yres);
 
 	screen_width = max_xres * 0.6f;
-	screen_height = max_xres / 8.0f;
+	screen_height = screen_width * 0.2f;
 
 	if (SDK_create_window(screen_width, screen_height, 0, "mpflow") < 0) {
 		fprintf(stderr, "error: failed to create window\n");
@@ -111,8 +117,8 @@ int create_texture(SDL_Surface *img, GLuint tex_id) {
 int format;
 
 	switch(img->format->BytesPerPixel) {
-		case 1:
-			format = GL_COLOR_INDEX;
+		case 1:								/* grayscale jpg? */
+			format = GL_COLOR_INDEX;		/* so, this is probaby wrong ... */
 			break;
 
 		case 3:
