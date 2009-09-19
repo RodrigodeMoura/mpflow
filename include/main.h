@@ -9,8 +9,8 @@
 #define ARENA_HEIGHT	160
 #define Z_FAR			160
 
-#define COVER_W			140
-#define COVER_H			140
+#define MOVE_LEFT		1
+#define MOVE_RIGHT		2
 
 #endif	/* MAIN_H_WJ109 */
 

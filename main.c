@@ -6,6 +6,7 @@
 #include "SDK.h"
 #include "SDL_image.h"
 #include "glut.h"
+#include "cover.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,6 +18,7 @@ int screen_height = 200;
 int max_xres = 320, max_yres = 200;		/* maximum display resolution (as reported by SDK_max_videomode()) */
 
 int key_down = 0;
+int moving = 0;
 
 GLuint textures[11];
 
@@ -56,6 +58,29 @@ void handle_keypress(int key) {
 			SDK_exit(0);
 			break;
 
+		case SDK_LEFT:
+			moving = MOVE_LEFT;
+			break;
+
+		case SDK_RIGHT:
+			moving = MOVE_RIGHT;
+			break;
+
+		default:
+			;
+	}
+}
+
+void handle_keyrelease(int key) {
+	switch(key) {
+		case SDK_LEFT:
+			moving = 0;
+			break;
+
+		case SDK_RIGHT:
+			moving = 0;
+			break;
+
 		default:
 			;
 	}
@@ -65,8 +90,10 @@ void key_event(SDK_Event state, int key) {
 	if (state == SDK_PRESS) {
 		key_down = key;
 		handle_keypress(key);
-	} else
+	} else {
 		key_down = 0;
+		handle_keyrelease(key);
+	}
 }
 
 void window_event(SDK_Event event, int w, int h) {
@@ -186,113 +213,12 @@ GLfloat vertex_arr[8] = {
 	glMatrixMode(GL_MODELVIEW);
 }
 
-void draw_cover(void) {
-GLfloat vertex_arr[8] = {
-	-COVER_W * 0.5f, COVER_H * 0.5f,
-	-COVER_W * 0.5f, -COVER_H * 0.5f,
-	COVER_W * 0.5f, COVER_H * 0.5f,
-	COVER_W * 0.5f, -COVER_H * 0.5f
-};
-GLfloat line_arr[8] = {
-	-COVER_W * 0.5f, -COVER_H * 0.5f,
-	-COVER_W * 0.5f, COVER_H * 0.5f,
-	COVER_W * 0.5f, COVER_H * 0.5f,
-	COVER_W * 0.5f, -COVER_H * 0.5f
-};
-GLfloat tex_arr[8] = {
-	0, 0,
-	0, 1,
-	1, 0,
-	1, 1,
-};
-GLfloat tex_reflect[8] = {
-	0, 1,
-	0, 0,
-	1, 1,
-	1, 0
-};
-
-	glColor4f(1, 1, 1, 1);
-
-	glEnable(GL_TEXTURE_2D);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	glBindTexture(GL_TEXTURE_2D, textures[0]);
-
-	glVertexPointer(2, GL_FLOAT, 0, vertex_arr);
-	glTexCoordPointer(2, GL_FLOAT, 0, tex_arr);
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-/* draw fake reflection */
-	glPushMatrix();
-	glTranslatef(0, -COVER_H, 0);
-/*
-	do not use alpha blending; blend makes the reflections blend thru each other,
-	which we don't want to happen
-*/
-	glColor4f(0.25f, 0.25f, 0.25f, 1);
-
-	glVertexPointer(2, GL_FLOAT, 0, vertex_arr);
-	glTexCoordPointer(2, GL_FLOAT, 0, tex_reflect);
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-	glPopMatrix();
-
-/*
-	draw border around cover
-	for some strange reason, OpenGL rotates the values in the vertex_arr around,
-	so we can not reuse it here; I use line_arr instead
-*/
-	glDisable(GL_TEXTURE_2D);
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-
-	glColor4f(1, 1, 1, 1);
-	glLineWidth(1.0f);
-
-	glVertexPointer(2, GL_FLOAT, 0, line_arr);
-	glDrawArrays(GL_LINE_LOOP, 0, 4);
-}
-
 void draw(void) {
-float center_x, center_y, pos;
-int n;
-
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
 	glTranslatef(-ARENA_WIDTH * 0.5f, -ARENA_HEIGHT * 0.5f, -180);
 
-	center_x = ARENA_WIDTH * 0.5f;
-	center_y = ARENA_HEIGHT * 0.5f;
-
-/* left side */
-	pos = center_x - COVER_W * 1.4f;
-	for(n = 0; n < 5; n++) {
-		glPushMatrix();
-		glTranslatef(pos, center_y, -50);
-		glRotatef(60.0f, 0, 1, 0);
-		draw_cover();
-		glPopMatrix();
-
-		pos += (COVER_W * 0.125f);
-	}
-
-/* right side */
-	pos = center_x + COVER_W * 1.4f;
-	for(n = 0; n < 5; n++) {
-		glPushMatrix();
-		glTranslatef(pos, center_y, -50);
-		glRotatef(-60.0f, 0, 1, 0);
-		draw_cover();
-		glPopMatrix();
-
-		pos -= (COVER_W * 0.125f);
-	}
-
-/* center cover */
-	glPushMatrix();
-	glTranslatef(center_x, center_y, 0);
-	draw_cover();
-	glPopMatrix();
-
+	draw_covers();
 	draw_window_border();
 
 	glFlush();
