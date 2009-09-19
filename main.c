@@ -166,19 +166,26 @@ GLfloat vertex_arr[8] = {
 	glDisable(GL_TEXTURE_2D);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
-	glPolygonMode(GL_FRONT, GL_LINE);
-
 	glColor4f(1, 1, 1, 1);
 	glLineWidth(4.0f);
 
 	glVertexPointer(2, GL_FLOAT, 0, vertex_arr);
-	glDrawArrays(GL_QUADS, 0, 4);
-
-	glPolygonMode(GL_FRONT, GL_FILL);
+	glDrawArrays(GL_LINE_LOOP, 0, 4);
 }
 
 void draw_cover(void) {
-GLfloat vertex_arr[8];
+GLfloat vertex_arr[8] = {
+	0, 0,
+	COVER_W, 0,
+	COVER_W, COVER_H,
+	0, COVER_H
+};
+GLfloat line_arr[8] = {
+	0, 0,
+	COVER_W, 0,
+	COVER_W, COVER_H,
+	0, COVER_H
+};
 GLfloat tex_arr[8] = {
 	0, 0,
 	0, 1,
@@ -200,6 +207,19 @@ GLfloat tex_arr[8] = {
 	glVertexPointer(2, GL_FLOAT, 0, vertex_arr);
 	glTexCoordPointer(2, GL_FLOAT, 0, tex_arr);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+/*
+	draw border around cover
+	for some strange reason, OpenGL rotates the values in the vertex_arr around,
+	so we can not reuse it here; I use line_arr instead
+*/
+	glDisable(GL_TEXTURE_2D);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+
+	glColor4f(1, 1, 1, 1);
+	glLineWidth(1.0f);
+
+	glVertexPointer(2, GL_FLOAT, 0, line_arr);
+	glDrawArrays(GL_LINE_LOOP, 0, 4);
 }
 
 void draw(void) {
