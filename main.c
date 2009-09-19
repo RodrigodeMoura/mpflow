@@ -5,6 +5,7 @@
 #include "main.h"
 #include "SDK.h"
 #include "SDL_image.h"
+#include "glut.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -26,12 +27,7 @@ void draw(void);
 void init_gl(void) {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-
-#ifdef OPENGLES
-	glOrthof(0.0f, ARENA_WIDTH, 0.0f, ARENA_HEIGHT, -Z_FAR, Z_FAR);
-#else
-	glOrtho(0.0f, ARENA_WIDTH, 0.0f, ARENA_HEIGHT, -Z_FAR, Z_FAR);
-#endif
+	gluPerspective(60, (float)ARENA_WIDTH / (float)ARENA_HEIGHT, 0.01f, 1000);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -47,7 +43,7 @@ void init_gl(void) {
 
 	glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
 	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-
+	glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
 /* simply always turn this on */
@@ -155,13 +151,25 @@ SDL_Surface *img;
 /*
 	draw white frame around window
 */
-void draw_frame(void) {
+void draw_window_border(void) {
 GLfloat vertex_arr[8] = {
 	0, 0,
 	ARENA_WIDTH, 0,
 	ARENA_WIDTH, ARENA_HEIGHT,
 	0, ARENA_HEIGHT
 };
+
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+#ifdef OPENGLES
+	glOrthof(0.0f, ARENA_WIDTH, 0.0f, ARENA_HEIGHT, -Z_FAR, Z_FAR);
+#else
+	glOrtho(0.0f, ARENA_WIDTH, 0.0f, ARENA_HEIGHT, -Z_FAR, Z_FAR);
+#endif
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
 
 	glDisable(GL_TEXTURE_2D);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -171,20 +179,25 @@ GLfloat vertex_arr[8] = {
 
 	glVertexPointer(2, GL_FLOAT, 0, vertex_arr);
 	glDrawArrays(GL_LINE_LOOP, 0, 4);
+
+	glPopMatrix();
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
 }
 
 void draw_cover(void) {
 GLfloat vertex_arr[8] = {
-	0, 0,
-	COVER_W, 0,
-	COVER_W, COVER_H,
-	0, COVER_H
+	-COVER_W * 0.5f, COVER_H * 0.5f,
+	-COVER_W * 0.5f, -COVER_H * 0.5f,
+	COVER_W * 0.5f, COVER_H * 0.5f,
+	COVER_W * 0.5f, -COVER_H * 0.5f
 };
 GLfloat line_arr[8] = {
-	0, 0,
-	COVER_W, 0,
-	COVER_W, COVER_H,
-	0, COVER_H
+	-COVER_W * 0.5f, -COVER_H * 0.5f,
+	-COVER_W * 0.5f, COVER_H * 0.5f,
+	COVER_W * 0.5f, COVER_H * 0.5f,
+	COVER_W * 0.5f, -COVER_H * 0.5f
 };
 GLfloat tex_arr[8] = {
 	0, 0,
@@ -194,11 +207,6 @@ GLfloat tex_arr[8] = {
 };
 
 	glColor4f(1, 1, 1, 1);
-
-	vertex_arr[0] = vertex_arr[2] = 0;
-	vertex_arr[1] = vertex_arr[5] = COVER_W;
-	vertex_arr[3] = vertex_arr[7] = 0;
-	vertex_arr[4] = vertex_arr[6] = COVER_H;
 
 	glEnable(GL_TEXTURE_2D);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -223,13 +231,36 @@ GLfloat tex_arr[8] = {
 }
 
 void draw(void) {
+float center_x, center_y;
+
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
+	glTranslatef(-ARENA_WIDTH * 0.5f, -ARENA_HEIGHT * 0.5f, -180);
 
-	draw_frame();
+	center_x = ARENA_WIDTH * 0.5f;
+	center_y = ARENA_HEIGHT * 0.5f;
 
-	glTranslatef((ARENA_WIDTH - COVER_W) * 0.5f, (ARENA_HEIGHT - COVER_H) * 0.5f, 0.0f);
+/* left side */
+	glPushMatrix();
+	glTranslatef(center_x - COVER_W, center_y, -50);
+	glRotatef(60.0f, 0, 1, 0);
 	draw_cover();
+	glPopMatrix();
+
+/* right side */
+	glPushMatrix();
+	glTranslatef(center_x + COVER_W, center_y, -50);
+	glRotatef(-60.0f, 0, 1, 0);
+	draw_cover();
+	glPopMatrix();
+
+/* center cover */
+	glPushMatrix();
+	glTranslatef(center_x, center_y, 0);
+	draw_cover();
+	glPopMatrix();
+
+	draw_window_border();
 
 	glFlush();
 	SDK_swapbuffers();
