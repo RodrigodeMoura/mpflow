@@ -205,6 +205,12 @@ GLfloat tex_arr[8] = {
 	1, 0,
 	1, 1,
 };
+GLfloat tex_reflect[8] = {
+	0, 1,
+	0, 0,
+	1, 1,
+	1, 0
+};
 
 	glColor4f(1, 1, 1, 1);
 
@@ -215,6 +221,22 @@ GLfloat tex_arr[8] = {
 	glVertexPointer(2, GL_FLOAT, 0, vertex_arr);
 	glTexCoordPointer(2, GL_FLOAT, 0, tex_arr);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+/* draw fake reflection */
+	glPushMatrix();
+	glTranslatef(0, -COVER_H, 0);
+/*
+	do not use alpha blending; blend makes the reflections blend thru each other,
+	which we don't want to happen
+*/
+	glColor4f(0.25f, 0.25f, 0.25f, 1);
+
+	glVertexPointer(2, GL_FLOAT, 0, vertex_arr);
+	glTexCoordPointer(2, GL_FLOAT, 0, tex_reflect);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+	glPopMatrix();
+
 /*
 	draw border around cover
 	for some strange reason, OpenGL rotates the values in the vertex_arr around,
