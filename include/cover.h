@@ -11,12 +11,13 @@
 #define COVER_H			COVER_W
 
 typedef struct {
-	float x, y, z, angle;
+	float x, y, z, angle, color;
 	int texture_idx;
 } Cover;
 
 extern Cover covers[NUM_COVERS];
 
+void init_covers(void);
 void draw_covers(void);
 
 #endif	/* COVER_H_WJ109 */

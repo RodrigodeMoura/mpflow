@@ -232,6 +232,7 @@ int main(int argc, char *argv[]) {
 	create_window();
 
 	init_gl();
+	init_covers();
 	load();
 
 	SDK_key_event(key_event);

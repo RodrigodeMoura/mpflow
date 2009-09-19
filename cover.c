@@ -15,7 +15,55 @@ Cover covers[NUM_COVERS];
 extern GLuint textures[11];
 
 
-void draw_cover(float color) {
+void init_covers(void) {
+int i;
+float xpos, ypos, zpos, color;
+
+/* left side */
+	xpos = ARENA_WIDTH * 0.5f - COVER_W * 1.4f;
+	ypos = ARENA_HEIGHT * 0.5f;
+	zpos = -50;
+	color = 0.5f;
+
+	for(i = 0; i < 5; i++) {
+		covers[i].x = xpos;
+		covers[i].y = ypos;
+		covers[i].z = zpos;
+		covers[i].angle = 60;
+		covers[i].color = color;
+		covers[i].texture_idx = 0;
+
+		xpos += (COVER_W * 0.125f);
+		color += 0.1f;
+	}
+
+/* right side */
+	xpos = ARENA_WIDTH * 0.5f + COVER_W * 1.4f;
+	color = 0.5f;
+
+	for(i = 10; i > 5; i--) {
+		covers[i].x = xpos;
+		covers[i].y = ypos;
+		covers[i].z = zpos;
+		covers[i].angle = -60;
+		covers[i].color = color;
+		covers[i].texture_idx = 0;
+
+		xpos -= (COVER_W * 0.125f);
+		color += 0.1f;
+	}
+
+/* center cover */
+	covers[5].x = ARENA_WIDTH * 0.5f;
+	covers[5].y = ypos;
+	covers[5].z = 0;
+	covers[5].angle = 0;
+	covers[5].color = 1;
+	covers[5].texture_idx = 0;
+}
+
+
+void draw_cover(Cover *c) {
 GLfloat vertex_arr[8] = {
 	-COVER_W * 0.5f, COVER_H * 0.5f,
 	-COVER_W * 0.5f, -COVER_H * 0.5f,
@@ -41,11 +89,15 @@ GLfloat tex_reflect[8] = {
 	1, 0
 };
 
-	glColor4f(color, color, color, 1);
+	glPushMatrix();
+	glTranslatef(c->x, c->y, c->z);
+	glRotatef(c->angle, 0, 1, 0);
+
+	glColor4f(c->color, c->color, c->color, 1);
 
 	glEnable(GL_TEXTURE_2D);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	glBindTexture(GL_TEXTURE_2D, textures[0]);
+	glBindTexture(GL_TEXTURE_2D, textures[c->texture_idx]);
 
 	glVertexPointer(2, GL_FLOAT, 0, vertex_arr);
 	glTexCoordPointer(2, GL_FLOAT, 0, tex_arr);
@@ -58,7 +110,7 @@ GLfloat tex_reflect[8] = {
 	do not use alpha blending; blend makes the reflections blend thru each other,
 	which we don't want to happen
 */
-	glColor4f(color * 0.25f, color * 0.25f, color * 0.25f, 1);
+	glColor4f(c->color * 0.25f, c->color * 0.25f, c->color * 0.25f, 1);
 
 	glVertexPointer(2, GL_FLOAT, 0, vertex_arr);
 	glTexCoordPointer(2, GL_FLOAT, 0, tex_reflect);
@@ -74,53 +126,20 @@ GLfloat tex_reflect[8] = {
 	glDisable(GL_TEXTURE_2D);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
-	glColor4f(color, color, color, 1);
+	glColor4f(c->color, c->color, c->color, 1);
 	glLineWidth(1.0f);
 
 	glVertexPointer(2, GL_FLOAT, 0, line_arr);
 	glDrawArrays(GL_LINE_LOOP, 0, 4);
+
+	glPopMatrix();
 }
 
 void draw_covers(void) {
-float center_x, center_y, pos, color;
-int n;
+int i;
 
-	center_x = ARENA_WIDTH * 0.5f;
-	center_y = ARENA_HEIGHT * 0.5f;
-
-/* left side */
-	color = 0.5f;
-	pos = center_x - COVER_W * 1.4f;
-	for(n = 0; n < 5; n++) {
-		glPushMatrix();
-		glTranslatef(pos, center_y, -50);
-		glRotatef(60.0f, 0, 1, 0);
-		draw_cover(color);
-		glPopMatrix();
-
-		pos += (COVER_W * 0.125f);
-		color += 0.1f;
-	}
-
-/* right side */
-	color = 0.5f;
-	pos = center_x + COVER_W * 1.4f;
-	for(n = 0; n < 5; n++) {
-		glPushMatrix();
-		glTranslatef(pos, center_y, -50);
-		glRotatef(-60.0f, 0, 1, 0);
-		draw_cover(color);
-		glPopMatrix();
-
-		pos -= (COVER_W * 0.125f);
-		color += 0.1f;
-	}
-
-/* center cover */
-	glPushMatrix();
-	glTranslatef(center_x, center_y, 0);
-	draw_cover(1);
-	glPopMatrix();
+	for(i = 0; i < NUM_COVERS; i++)
+		draw_cover(&covers[i]);
 }
 
 /* EOB */
