@@ -62,6 +62,57 @@ float xpos, ypos, zpos, color;
 	covers[CENTER_COVER].texture_idx = 0;
 }
 
+void move_cover_left(void) {
+float xpos, zpos;
+
+	xpos = ARENA_WIDTH * 0.5f - COVER_W * 1.4f + (CENTER_COVER-1) * COVER_W * 0.125f;
+	zpos = -50;
+
+	if (covers[CENTER_COVER].x > xpos) {
+		covers[CENTER_COVER].x -= 1;
+		if (covers[CENTER_COVER].x < xpos)
+			covers[CENTER_COVER].x = xpos;
+	}
+	if (covers[CENTER_COVER].z > zpos) {
+		covers[CENTER_COVER].z -= 1;
+		if (covers[CENTER_COVER].z < zpos)
+			covers[CENTER_COVER].z = zpos;
+	}
+	if (covers[CENTER_COVER].angle < 60) {
+		covers[CENTER_COVER].angle += 1;
+		if (covers[CENTER_COVER].angle > 60)
+			covers[CENTER_COVER].angle = 60;
+	}
+	if (covers[CENTER_COVER].x <= xpos && covers[CENTER_COVER].angle >= 60)
+		moving = 0;
+}
+
+void move_cover_right(void) {
+float xpos, zpos;
+
+	xpos = ARENA_WIDTH * 0.5f + COVER_W * 1.4f - (CENTER_COVER-1) * COVER_W * 0.125f;
+	zpos = -50;
+
+	if (covers[CENTER_COVER].x < xpos) {
+		covers[CENTER_COVER].x += 1;
+		if (covers[CENTER_COVER].x > xpos)
+			covers[CENTER_COVER].x = xpos;
+	}
+	if (covers[CENTER_COVER].z > zpos) {
+		covers[CENTER_COVER].z -= 1;
+		if (covers[CENTER_COVER].z < zpos)
+			covers[CENTER_COVER].z = zpos;
+	}
+	if (covers[CENTER_COVER].angle > -60) {
+		covers[CENTER_COVER].angle -= 1;
+		if (covers[CENTER_COVER].angle < -60)
+			covers[CENTER_COVER].angle = -60;
+	}
+	if (covers[CENTER_COVER].x >= xpos && covers[CENTER_COVER].angle <= -60)
+		moving = 0;
+}
+
+
 void draw_cover(Cover *c) {
 GLfloat vertex_arr[8] = {
 	-COVER_W * 0.5f, COVER_H * 0.5f,

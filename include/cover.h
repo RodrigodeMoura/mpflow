@@ -19,6 +19,8 @@ typedef struct {
 extern Cover covers[NUM_COVERS];
 
 void init_covers(void);
+void move_cover_left(void);
+void move_cover_right(void);
 void draw_covers(void);
 
 #endif	/* COVER_H_WJ109 */

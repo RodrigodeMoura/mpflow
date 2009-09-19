@@ -74,11 +74,9 @@ void handle_keypress(int key) {
 void handle_keyrelease(int key) {
 	switch(key) {
 		case SDK_LEFT:
-			moving = 0;
 			break;
 
 		case SDK_RIGHT:
-			moving = 0;
 			break;
 
 		default:
@@ -225,6 +223,22 @@ void draw(void) {
 	SDK_swapbuffers();
 }
 
+void move(void) {
+	switch(moving) {
+		case MOVE_LEFT:
+			move_cover_left();
+			draw();
+			break;
+
+		case MOVE_RIGHT:
+			move_cover_right();
+			draw();
+			break;
+
+		default:
+			;
+	}
+}
 
 int main(int argc, char *argv[]) {
 	SDK_init();
@@ -242,7 +256,8 @@ int main(int argc, char *argv[]) {
 
 	for(;;) {
 		SDK_handle_events();
-		SDK_sleep(200);
+		move();
+		SDK_sleep(50);
 	}
 	return 0;
 }
