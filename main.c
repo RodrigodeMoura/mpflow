@@ -14,12 +14,13 @@ int screen_height = 200;
 
 int max_xres = 320, max_yres = 200;		/* maximum display resolution (as reported by SDK_max_videomode()) */
 
-int key_down;
+int key_down = 0;
 
 
 void handle_keypress(int key) {
 	switch(key) {
 		case SDK_ESC:
+			SDK_exit(0);
 			break;
 
 		default:
@@ -50,7 +51,7 @@ void create_window(void) {
 	SDK_max_videomode(&max_xres, &max_yres);
 
 	screen_width = max_xres * 0.6f;
-	screen_height = max_yres * 0.2f;
+	screen_height = max_yres * 0.25f;
 
 	if (SDK_create_window(screen_width, screen_height, 0, "mpflow") < 0) {
 		fprintf(stderr, "error: failed to create window\n");
@@ -67,12 +68,10 @@ int main(int argc, char *argv[]) {
 	SDK_key_event(key_event);
 	SDK_window_event(window_event);
 
-	key_down = 0;
-	while(key_down != SDK_ESC) {
+	for(;;) {
 		SDK_handle_events();
 		SDK_sleep(200);
 	}
-	SDK_exit(0);
 	return 0;
 }
 
