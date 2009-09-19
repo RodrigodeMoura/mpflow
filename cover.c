@@ -25,7 +25,7 @@ float xpos, ypos, zpos, color;
 	zpos = -50;
 	color = 0.5f;
 
-	for(i = 0; i < 5; i++) {
+	for(i = 0; i < CENTER_COVER; i++) {
 		covers[i].x = xpos;
 		covers[i].y = ypos;
 		covers[i].z = zpos;
@@ -41,7 +41,7 @@ float xpos, ypos, zpos, color;
 	xpos = ARENA_WIDTH * 0.5f + COVER_W * 1.4f;
 	color = 0.5f;
 
-	for(i = 10; i > 5; i--) {
+	for(i = NUM_COVERS-1; i > CENTER_COVER; i--) {
 		covers[i].x = xpos;
 		covers[i].y = ypos;
 		covers[i].z = zpos;
@@ -54,14 +54,13 @@ float xpos, ypos, zpos, color;
 	}
 
 /* center cover */
-	covers[5].x = ARENA_WIDTH * 0.5f;
-	covers[5].y = ypos;
-	covers[5].z = 0;
-	covers[5].angle = 0;
-	covers[5].color = 1;
-	covers[5].texture_idx = 0;
+	covers[CENTER_COVER].x = ARENA_WIDTH * 0.5f;
+	covers[CENTER_COVER].y = ypos;
+	covers[CENTER_COVER].z = 0;
+	covers[CENTER_COVER].angle = 0;
+	covers[CENTER_COVER].color = 1;
+	covers[CENTER_COVER].texture_idx = 0;
 }
-
 
 void draw_cover(Cover *c) {
 GLfloat vertex_arr[8] = {

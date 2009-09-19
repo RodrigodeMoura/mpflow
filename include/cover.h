@@ -5,7 +5,8 @@
 #ifndef COVER_H_WJ109
 #define COVER_H_WJ109	1
 
-#define NUM_COVERS		11
+#define CENTER_COVER	5
+#define NUM_COVERS		(CENTER_COVER*2 + 1)
 
 #define COVER_W			140
 #define COVER_H			COVER_W
