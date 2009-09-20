@@ -214,6 +214,7 @@ GLfloat vertex_arr[8] = {
 void draw(void) {
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
+
 	glTranslatef(-ARENA_WIDTH * 0.5f, -ARENA_HEIGHT * 0.5f, -180);
 
 	draw_covers();
