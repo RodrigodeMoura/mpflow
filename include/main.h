@@ -12,6 +12,8 @@
 #define MOVE_LEFT		1
 #define MOVE_RIGHT		2
 
+#define FPS				30
+
 extern int moving;
 
 #endif	/* MAIN_H_WJ109 */
