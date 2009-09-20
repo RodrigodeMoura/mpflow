@@ -110,10 +110,15 @@ int i;
 		covers[i].x -= step_x;
 		covers[i].color -= step_color;
 	}
+	if (covers[1].x < covers[0].x)
+		covers[1].x = covers[0].x;
+
 	for(i = CENTER_COVER+1; i < NUM_COVERS-1; i++) {
 		covers[i].x -= step_x;
 		covers[i].color += step_color;
 	}
+	if (covers[NUM_COVERS-2].x > covers[NUM_COVERS-1].x)
+		covers[NUM_COVERS-2].x = covers[NUM_COVERS-1].x;
 
 /* move the center cover to the left */
 	xpos = ARENA_WIDTH * 0.5f - COVER_W * 1.4f + (CENTER_COVER-1) * COVER_W * 0.125f;
@@ -252,8 +257,25 @@ GLfloat tex_reflect[8] = {
 void draw_covers(void) {
 int i;
 
-	for(i = 0; i < NUM_COVERS; i++)
+	glDisable(GL_DEPTH_TEST);
+/*
+	draw in this order; without depth buffer
+	this is mainly because the covers on the far left and right should be in the back
+*/
+	for(i = 0; i < CENTER_COVER-1; i++)
 		draw_cover(&covers[i]);
+
+	for(i = NUM_COVERS-1; i > CENTER_COVER+1; i--)
+		draw_cover(&covers[i]);
+
+/*
+	enable depth buffer; otherwise the flipping covers might intersect and look ugly
+*/
+	glEnable(GL_DEPTH_TEST);
+
+	draw_cover(&covers[CENTER_COVER-1]);
+	draw_cover(&covers[CENTER_COVER]);
+	draw_cover(&covers[CENTER_COVER+1]);
 }
 
 /* EOB */
