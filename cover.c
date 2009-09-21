@@ -80,12 +80,24 @@ float xpos, ypos, color;
 }
 
 static void shift_covers_left(void) {
-	;
+int i;
+
+/* TODO delete texture covers[0] */
+
+	memmove(&covers[0], &covers[1], sizeof(Cover) * (NUM_COVERS-1));
+
+	for(i = 0; i < NUM_COVERS; i++)
+		covers[i].pos = i;
+
+/* TODO insert new texture at covers[NUM_COVERS-1] */
 }
 
 void move_cover_left(Cover *c) {
 float xpos, step_x, step_z, step_angle, target_angle, step_color, speed;
 int i, anim_done;
+
+	if (!moving)
+		return;
 
 	if (c->pos < 2)
 		return;
