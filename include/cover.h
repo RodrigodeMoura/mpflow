@@ -17,14 +17,14 @@
 
 typedef struct {
 	float x, y, z, angle, color;
-	int texture_idx;
+	int pos, texture_idx;
 } Cover;
 
 extern Cover covers[NUM_COVERS];
 
 void init_covers(void);
-void move_cover_left(void);
-void move_cover_right(void);
+void move_covers_left(void);
+void move_covers_right(void);
 void draw_covers(void);
 
 #endif	/* COVER_H_WJ109 */

@@ -29,6 +29,7 @@ float xpos, ypos, color;
 	covers[0].z = COVER_Z;
 	covers[0].angle = COVER_ANGLE;
 	covers[0].color = color;
+	covers[0].pos = 0;
 	covers[0].texture_idx = 0;
 
 	for(i = 1; i < CENTER_COVER; i++) {
@@ -37,6 +38,7 @@ float xpos, ypos, color;
 		covers[i].z = COVER_Z;
 		covers[i].angle = COVER_ANGLE;
 		covers[i].color = color;
+		covers[i].pos = i;
 		covers[i].texture_idx = 0;
 
 		xpos += COVER_DISTANCE;
@@ -60,6 +62,7 @@ float xpos, ypos, color;
 		covers[i].z = COVER_Z;
 		covers[i].angle = -COVER_ANGLE;
 		covers[i].color = color;
+		covers[i].pos = i;
 		covers[i].texture_idx = 0;
 
 		xpos -= COVER_DISTANCE;
@@ -72,113 +75,106 @@ float xpos, ypos, color;
 	covers[CENTER_COVER].z = 0;
 	covers[CENTER_COVER].angle = 0;
 	covers[CENTER_COVER].color = 1;
+	covers[CENTER_COVER].pos = CENTER_COVER;
 	covers[CENTER_COVER].texture_idx = 0;
 }
 
-void insert_cover_left(void) {
+static void shift_covers_left(void) {
 	;
 }
 
-void insert_cover_right(void) {
-int i, tex;
+void move_cover_left(Cover *c) {
+float xpos, step_x, step_z, step_angle, target_angle, step_color, speed;
+int i, anim_done;
 
-/* TODO: delete texture that was on the left */
+	if (c->pos < 2)
+		return;
 
-	tex = covers[0].texture_idx;
+	speed = FPS * 0.25f;
 
-	for(i = 1; i < NUM_COVERS; i++) {
-		covers[i-1].x = covers[i].x;
-		covers[i-1].y = covers[i].y;
-		covers[i-1].z = covers[i].z;
-		covers[i-1].angle = covers[i].angle;
-		covers[i-1].color = covers[i].color;
-		covers[i-1].texture_idx = covers[i].texture_idx;
-	}
-	covers[NUM_COVERS-1].x = ARENA_WIDTH * 0.5f + CENTER_SPACE + 5 * COVER_DISTANCE;
-	covers[NUM_COVERS-1].texture_idx = tex;
-}
+	step_z = 0.0f;
+	step_angle = 0.0f;
+	target_angle = 0.0f;
 
-void move_cover_left(void) {
-float xpos, step_x, step_z, step_angle, step_color, speed;
-int i;
+	if (c->pos == CENTER_COVER || c->pos == CENTER_COVER+1) {
+		step_x = -CENTER_SPACE / speed;
+		step_z = -COVER_Z / speed;
+		step_angle = COVER_ANGLE / speed;
 
-	speed = FPS * 0.5f;
-	step_x = COVER_DISTANCE / speed;
+		if (c->pos == CENTER_COVER) {
+			target_angle = COVER_ANGLE;
+
+			c->z -= step_z;
+			if (c->z < COVER_Z)
+				c->z = COVER_Z;
+		} else {
+			c->z += step_z;
+			if (c->z > 0.0f)
+				c->z = 0.0f;
+		}
+		c->angle += step_angle;
+		if (c->angle >= target_angle)
+			c->angle = target_angle;
+	} else
+		step_x = -COVER_DISTANCE / speed;
+
 	step_color = 0.1f / speed;
 
-	for(i = 1; i < CENTER_COVER; i++) {
-		covers[i].x -= step_x;
-		covers[i].color -= step_color;
-	}
-	if (covers[1].x < covers[0].x)
-		covers[1].x = covers[0].x;
+	c->x += step_x;
+	c->color += step_color;
 
-	for(i = CENTER_COVER+1; i < NUM_COVERS-1; i++) {
-		covers[i].x -= step_x;
-		covers[i].color += step_color;
-	}
-	if (covers[NUM_COVERS-2].x > covers[NUM_COVERS-1].x)
-		covers[NUM_COVERS-2].x = covers[NUM_COVERS-1].x;
+/* check new positions */
+	anim_done = 0;
 
-/* move the center cover to the left */
-	xpos = ARENA_WIDTH * 0.5f - COVER_W * 1.4f + (CENTER_COVER-1) * COVER_W * 0.125f;
+/* left side */
+	xpos = ARENA_WIDTH * 0.5f - CENTER_SPACE - 5 * COVER_DISTANCE;
 
-	step_x = CENTER_SPACE / speed;
-	step_z = COVER_Z / speed;
-	step_angle = COVER_ANGLE / (FPS * 0.35f);		/* turn a bit faster */
+	for(i = 2; i <= CENTER_COVER; i++) {
+		if (covers[i].x <= xpos) {
+			covers[i].x = xpos;
+			anim_done++;
+		}
+		xpos += COVER_DISTANCE;
+	}
+/* right side */
+	xpos = ARENA_WIDTH * 0.5f + CENTER_SPACE + COVER_DISTANCE;
 
-	if (covers[CENTER_COVER].x > xpos) {
-		covers[CENTER_COVER].x -= step_x;
-		if (covers[CENTER_COVER].x < xpos)
-			covers[CENTER_COVER].x = xpos;
+	for(i = CENTER_COVER+2; i < NUM_COVERS-1; i++) {
+		if (covers[i].x <= xpos) {
+			covers[i].x = xpos;
+			anim_done++;
+		}
+		xpos += COVER_DISTANCE;
 	}
-	if (covers[CENTER_COVER].z > COVER_Z) {
-		covers[CENTER_COVER].z += step_z;
-		if (covers[CENTER_COVER].z < COVER_Z)
-			covers[CENTER_COVER].z = COVER_Z;
-	}
-	if (covers[CENTER_COVER].angle < COVER_ANGLE) {
-		covers[CENTER_COVER].angle += step_angle;
-		if (covers[CENTER_COVER].angle > COVER_ANGLE)
-			covers[CENTER_COVER].angle = COVER_ANGLE;
-	}
-	covers[CENTER_COVER].color -= step_color;
-	if (covers[CENTER_COVER].color < 0.9f)
-		covers[CENTER_COVER].color = 0.9f;
-
-/* move the cover on the right to the center */
+/* the cover that just moved into center position */
 	xpos = ARENA_WIDTH * 0.5f;
 
-	if (covers[CENTER_COVER+1].x > xpos) {
-		covers[CENTER_COVER+1].x -= step_x;
-		if (covers[CENTER_COVER+1].x < xpos)
-			covers[CENTER_COVER+1].x = xpos;
+	if (covers[CENTER_COVER+1].x <= xpos) {
+		covers[CENTER_COVER+1].x = xpos;
+		anim_done++;
 	}
-	if (covers[CENTER_COVER+1].z < 0.0f) {
-		covers[CENTER_COVER+1].z -= step_z;
-		if (covers[CENTER_COVER+1].z > 0.0f)
-			covers[CENTER_COVER+1].z = 0.0f;
-	}
-	if (covers[CENTER_COVER+1].angle < 0.0f) {
-		covers[CENTER_COVER+1].angle += step_angle;
-		if (covers[CENTER_COVER+1].angle > 0.0f)
-			covers[CENTER_COVER+1].angle = 0.0f;
-	}
-	covers[CENTER_COVER+1].color += step_color;
-	if (covers[CENTER_COVER+1].color > 1.0f)
-		covers[CENTER_COVER+1].color = 1.0f;
-
-/* if centered, stop */
-	if (covers[CENTER_COVER+1].x <= xpos && covers[CENTER_COVER+1].angle >= 0.0f) {
-		covers[CENTER_COVER+1].color = 1.0f;
-		covers[CENTER_COVER].color = 0.9f;
+	if (anim_done >= NUM_COVERS-3) {
 		moving = 0;
-		insert_cover_right();
+		shift_covers_left();
 	}
 }
 
-void move_cover_right(void) {
+void move_cover_right(Cover *c) {
 	;
+}
+
+void move_covers_left(void) {
+int i;
+
+	for(i = 1; i < NUM_COVERS-1; i++)
+		move_cover_left(&covers[i]);
+}
+
+void move_covers_right(void) {
+int i;
+
+	for(i = 1; i < NUM_COVERS-1; i++)
+		move_cover_right(&covers[i]);
 }
 
 
@@ -269,7 +265,7 @@ int i;
 		draw_cover(&covers[i]);
 
 /*
-	enable depth buffer; otherwise the flipping covers might intersect and look ugly
+	enable depth buffer; otherwise the flipping covers might intersect unnaturally and look ugly
 */
 	glEnable(GL_DEPTH_TEST);
 

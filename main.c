@@ -225,14 +225,29 @@ void draw(void) {
 }
 
 void move(void) {
+	if (!moving) {
+/* TODO increase flipping speed to a certain maximum */
+		switch(key_down) {
+			case SDK_LEFT:
+				moving = MOVE_LEFT;
+				break;
+
+			case SDK_RIGHT:
+				moving = MOVE_RIGHT;
+				break;
+
+			default:
+				;
+		}
+	}
 	switch(moving) {
 		case MOVE_LEFT:
-			move_cover_left();
+			move_covers_left();
 			draw();
 			break;
 
 		case MOVE_RIGHT:
-			move_cover_right();
+			move_covers_right();
 			draw();
 			break;
 
