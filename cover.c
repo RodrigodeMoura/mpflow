@@ -112,13 +112,7 @@ int i, anim_done;
 	if (!moving)
 		return;
 
-/*
-	TODO pos is altijd 1 te groot of te klein; CENTER_COVER zou gewoon 5 moeten zijn
-*/
-	if (c->pos < 2)
-		return;
-
-	speed = FPS * 0.25f;
+	speed = FPS * 0.2f;
 
 	step_z = 0.0f;
 	step_angle = 0.0f;
@@ -196,10 +190,7 @@ int i, anim_done;
 	if (!moving)
 		return;
 
-	if (c->pos <= 0 || c->pos >= NUM_COVERS-2)
-		return;
-
-	speed = FPS * 0.25f;
+	speed = FPS * 0.2f;
 
 	step_z = 0.0f;
 	step_angle = 0.0f;
@@ -273,14 +264,14 @@ int i, anim_done;
 void move_covers_left(void) {
 int i;
 
-	for(i = 1; i < NUM_COVERS-1; i++)
+	for(i = 2; i < NUM_COVERS-1; i++)
 		move_cover_left(&covers[i]);
 }
 
 void move_covers_right(void) {
 int i;
 
-	for(i = 1; i < NUM_COVERS-1; i++)
+	for(i = 1; i < NUM_COVERS-2; i++)
 		move_cover_right(&covers[i]);
 }
 
