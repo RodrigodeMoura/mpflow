@@ -92,6 +92,19 @@ int i;
 /* TODO insert new texture at covers[NUM_COVERS-1] */
 }
 
+static void shift_covers_right(void) {
+int i;
+
+/* TODO delete texture covers[NUM_COVERS-1] */
+
+	memmove(&covers[1], &covers[0], sizeof(Cover) * (NUM_COVERS-1));
+
+	for(i = 0; i < NUM_COVERS; i++)
+		covers[i].pos = i;
+
+/* TODO insert new texture at covers[0] */
+}
+
 void move_cover_left(Cover *c) {
 float xpos, step_x, step_z, step_angle, target_angle, step_color, speed;
 int i, anim_done;
@@ -99,6 +112,9 @@ int i, anim_done;
 	if (!moving)
 		return;
 
+/*
+	TODO pos is altijd 1 te groot of te klein; CENTER_COVER zou gewoon 5 moeten zijn
+*/
 	if (c->pos < 2)
 		return;
 
@@ -125,12 +141,14 @@ int i, anim_done;
 				c->z = 0.0f;
 		}
 		c->angle += step_angle;
-		if (c->angle >= target_angle)
+		if (c->angle > target_angle)
 			c->angle = target_angle;
 	} else
 		step_x = -COVER_DISTANCE / speed;
 
 	step_color = 0.1f / speed;
+	if (c->pos <= CENTER_COVER)
+		step_color = -step_color;
 
 	c->x += step_x;
 	c->color += step_color;
@@ -172,7 +190,84 @@ int i, anim_done;
 }
 
 void move_cover_right(Cover *c) {
-	;
+float xpos, step_x, step_z, step_angle, target_angle, step_color, speed;
+int i, anim_done;
+
+	if (!moving)
+		return;
+
+	if (c->pos <= 0 || c->pos >= NUM_COVERS-2)
+		return;
+
+	speed = FPS * 0.25f;
+
+	step_z = 0.0f;
+	step_angle = 0.0f;
+	target_angle = 0.0f;
+
+	if (c->pos == CENTER_COVER || c->pos == CENTER_COVER-1) {
+		step_x = CENTER_SPACE / speed;
+		step_z = -COVER_Z / speed;
+		step_angle = COVER_ANGLE / speed;
+
+		if (c->pos == CENTER_COVER) {
+			target_angle = -COVER_ANGLE;
+
+			c->z -= step_z;
+			if (c->z < COVER_Z)
+				c->z = COVER_Z;
+		} else {
+			c->z += step_z;
+			if (c->z > 0.0f)
+				c->z = 0.0f;
+		}
+		c->angle -= step_angle;
+		if (c->angle < target_angle)
+			c->angle = target_angle;
+	} else
+		step_x = COVER_DISTANCE / speed;
+
+	step_color = 0.1f / speed;
+	if (c->pos >= CENTER_COVER)
+		step_color = -step_color;
+
+	c->x += step_x;
+	c->color += step_color;
+
+/* check new positions */
+	anim_done = 0;
+
+/* left side */
+	xpos = ARENA_WIDTH * 0.5f - CENTER_SPACE - 4 * COVER_DISTANCE;
+
+	for(i = 1; i < CENTER_COVER-1; i++) {
+		if (covers[i].x >= xpos) {
+			covers[i].x = xpos;
+			anim_done++;
+		}
+		xpos += COVER_DISTANCE;
+	}
+/* right side */
+	xpos = ARENA_WIDTH * 0.5f + CENTER_SPACE + COVER_DISTANCE;
+
+	for(i = CENTER_COVER; i < NUM_COVERS-2; i++) {
+		if (covers[i].x >= xpos) {
+			covers[i].x = xpos;
+			anim_done++;
+		}
+		xpos += COVER_DISTANCE;
+	}
+/* the cover that just moved into center position */
+	xpos = ARENA_WIDTH * 0.5f;
+
+	if (covers[CENTER_COVER-1].x >= xpos) {
+		covers[CENTER_COVER-1].x = xpos;
+		anim_done++;
+	}
+	if (anim_done >= NUM_COVERS-3) {
+		moving = 0;
+		shift_covers_right();
+	}
 }
 
 void move_covers_left(void) {

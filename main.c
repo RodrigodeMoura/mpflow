@@ -59,11 +59,13 @@ void handle_keypress(int key) {
 			break;
 
 		case SDK_LEFT:
-			moving = MOVE_LEFT;
+			if (!moving)
+				moving = MOVE_LEFT;
 			break;
 
 		case SDK_RIGHT:
-			moving = MOVE_RIGHT;
+			if (!moving)
+				moving = MOVE_RIGHT;
 			break;
 
 		default:
