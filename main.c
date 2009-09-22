@@ -18,6 +18,7 @@ int screen_width = 600;					/* current display resolution (or window size) */
 int screen_height = 200;
 
 int max_xres = 320, max_yres = 200;		/* maximum display resolution (as reported by SDK_max_videomode()) */
+int display_xres, display_yres;			/* current display resolution */
 
 int key_down = 0;
 int moving = 0;
@@ -117,7 +118,7 @@ void create_window(void) {
 SDL_SysWMinfo info;
 
 /*
-	TODO het moet eigenlijk niet 'max' zijn, maar 'current' video mode
+	Hmmm question: is the max video mode always the current video mode?
 */
 	SDK_max_videomode(&max_xres, &max_yres);
 
@@ -136,6 +137,23 @@ SDL_SysWMinfo info;
 	SDL_VERSION(&info.version);
 
 	if (SDL_GetWMInfo(&info) > 0 && info.subsystem == SDL_SYSWM_X11) {
+/*
+	This code gets the current video mode by reading the size of the desktop root window
+	The trouble is that it needs a window to be able to do that
+
+		Window root_window, child_window;
+		int a, b, c, d;
+		unsigned int u;
+		XWindowAttributes attrs;
+
+		info.info.x11.lock_func();
+
+		XQueryPointer(info.info.x11.display, info.info.x11.window, &root_window, &child_window, &a, &b, &c, &d, &u);
+		XGetWindowAttributes(info.info.x11.display, root_window, &attrs);
+
+		info.info.x11.unlock_func();
+		printf("TD root window size [%d, %d]\n", attrs.width, attrs.height);
+*/
 		info.info.x11.lock_func();
 		XMoveWindow(info.info.x11.display, info.info.x11.wmwindow, (max_xres - screen_width) / 2, (max_yres - screen_height) / 2);
 		info.info.x11.unlock_func();
