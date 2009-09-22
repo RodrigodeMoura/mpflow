@@ -2,13 +2,15 @@
 	mpflow	WJ109
 */
 
+/* TODO mouse drag window: mouse_down in top van window; XQueryPointer gebruiken, en dan XMoveWindow met pos+dx, dy offset */
+
 #include "main.h"
 #include "SDK.h"
 #include "SDL_image.h"
+#include "SDL_syswm.h"
 #include "glut.h"
 #include "cover.h"
-
-#include "SDL_syswm.h"
+#include "event.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,9 +21,6 @@ int screen_height = 200;
 
 int max_xres = 320, max_yres = 200;		/* maximum display resolution (as reported by SDK_max_videomode()) */
 int display_xres, display_yres;			/* current display resolution */
-
-int key_down = 0;
-int moving = 0;
 
 GLuint textures[11];
 
@@ -53,65 +52,6 @@ void init_gl(void) {
 
 /* simply always turn this on */
 	glEnableClientState(GL_VERTEX_ARRAY);
-}
-
-void handle_keypress(int key) {
-	switch(key) {
-		case SDK_ESC:
-			SDK_exit(0);
-			break;
-
-		case SDK_LEFT:
-			if (!moving)
-				moving = MOVE_LEFT;
-			break;
-
-		case SDK_RIGHT:
-			if (!moving)
-				moving = MOVE_RIGHT;
-			break;
-
-		default:
-			;
-	}
-}
-
-void handle_keyrelease(int key) {
-	switch(key) {
-		case SDK_LEFT:
-			break;
-
-		case SDK_RIGHT:
-			break;
-
-		default:
-			;
-	}
-}
-
-void key_event(SDK_Event state, int key) {
-	if (state == SDK_PRESS) {
-		key_down = key;
-		handle_keypress(key);
-	} else {
-		key_down = 0;
-		handle_keyrelease(key);
-	}
-}
-
-void window_event(SDK_Event event, int w, int h) {
-	switch(event) {
-		case SDK_CLOSE:
-			SDK_exit(0);
-			break;
-
-		case SDK_EXPOSE:
-			draw();
-			break;
-
-		default:
-			;
-	}
 }
 
 void create_window(void) {
@@ -302,8 +242,7 @@ int main(int argc, char *argv[]) {
 	init_covers();
 	load();
 
-	SDK_key_event(key_event);
-	SDK_window_event(window_event);
+	init_events();
 
 	draw();
 

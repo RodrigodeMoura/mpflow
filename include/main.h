@@ -9,12 +9,9 @@
 #define ARENA_HEIGHT	160
 #define Z_FAR			160
 
-#define MOVE_LEFT		1
-#define MOVE_RIGHT		2
-
 #define FPS				30
 
-extern int moving;
+void draw(void);
 
 #endif	/* MAIN_H_WJ109 */
 

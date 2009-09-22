@@ -5,6 +5,7 @@
 #include "cover.h"
 #include "SDK.h"
 #include "main.h"
+#include "event.h"
 
 #include <stdio.h>
 #include <stdlib.h>
