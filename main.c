@@ -8,6 +8,8 @@
 #include "glut.h"
 #include "cover.h"
 
+#include "SDL_syswm.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -112,6 +114,11 @@ void window_event(SDK_Event event, int w, int h) {
 }
 
 void create_window(void) {
+SDL_SysWMinfo info;
+
+/*
+	TODO het moet eigenlijk niet 'max' zijn, maar 'current' video mode
+*/
 	SDK_max_videomode(&max_xres, &max_yres);
 
 	screen_width = max_xres * 0.6f;
@@ -122,6 +129,16 @@ void create_window(void) {
 	if (SDK_create_window(screen_width, screen_height, 0, "mpflow") < 0) {
 		fprintf(stderr, "error: failed to create window\n");
 		SDK_exit(1);
+	}
+/*
+	put window in center of the screen
+*/
+	SDL_VERSION(&info.version);
+
+	if (SDL_GetWMInfo(&info) > 0 && info.subsystem == SDL_SYSWM_X11) {
+		info.info.x11.lock_func();
+		XMoveWindow(info.info.x11.display, info.info.x11.wmwindow, (max_xres - screen_width) / 2, (max_yres - screen_height) / 2);
+		info.info.x11.unlock_func();
 	}
 }
 
