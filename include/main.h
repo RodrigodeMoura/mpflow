@@ -11,6 +11,10 @@
 
 #define FPS				30
 
+extern int window_x;
+extern int window_y;
+
+void move_app_window(int, int);
 void draw(void);
 
 #endif	/* MAIN_H_WJ109 */

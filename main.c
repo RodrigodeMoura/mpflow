@@ -18,6 +18,7 @@
 
 int screen_width = 600;					/* current display resolution (or window size) */
 int screen_height = 200;
+int window_x, window_y;					/* window position */
 
 int max_xres = 320, max_yres = 200;		/* maximum display resolution (as reported by SDK_max_videomode()) */
 int display_xres, display_yres;			/* current display resolution */
@@ -94,11 +95,44 @@ SDL_SysWMinfo info;
 		info.info.x11.unlock_func();
 		printf("TD root window size [%d, %d]\n", attrs.width, attrs.height);
 */
+/* center window on screen */
+		window_x = (max_xres - screen_width) / 2;
+		window_y = (max_yres - screen_height) / 2;
+
 		info.info.x11.lock_func();
-		XMoveWindow(info.info.x11.display, info.info.x11.wmwindow, (max_xres - screen_width) / 2, (max_yres - screen_height) / 2);
+
+		XMoveWindow(info.info.x11.display, info.info.x11.wmwindow, window_x, window_y);
+		XMapRaised(info.info.x11.display, info.info.x11.wmwindow);
+
+		info.info.x11.unlock_func();
+	} else
+		window_x = window_y = 0;
+}
+
+/*
+	move application to screen coordinates (x, y)
+	This is used for window dragging
+*/
+void move_app_window(int x, int y) {
+SDL_SysWMinfo info;
+
+	SDL_VERSION(&info.version);
+
+	if (SDL_GetWMInfo(&info) > 0 && info.subsystem == SDL_SYSWM_X11) {
+		XWindowAttributes attrs;
+
+		info.info.x11.lock_func();
+
+		if (XGetWindowAttributes(info.info.x11.display, info.info.x11.wmwindow, &attrs)) {
+			XMoveWindow(info.info.x11.display, info.info.x11.wmwindow, x, y);
+/* assume XMoveWindow call succeeded :P */
+			window_x = x;
+			window_y = y;
+		}
 		info.info.x11.unlock_func();
 	}
 }
+
 
 int create_texture(SDL_Surface *img, GLuint tex_id) {
 int format;
