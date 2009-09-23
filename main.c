@@ -55,15 +55,45 @@ void init_gl(void) {
 	glEnableClientState(GL_VERTEX_ARRAY);
 }
 
-void create_window(void) {
+/*
+	get current display resolution from X11
+*/
+void get_display_res(int *w, int *h) {
 SDL_SysWMinfo info;
 
-/*
-	Hmmm question: is the max video mode always the current video mode?
-*/
-	SDK_max_videomode(&max_xres, &max_yres);
+	*w = *h = -1;
 
-	screen_width = max_xres * 0.6f;
+	SDL_VERSION(&info.version);
+
+	if (SDL_GetWMInfo(&info) > 0 && info.subsystem == SDL_SYSWM_X11) {
+		XWindowAttributes attrs;
+		Window root, parent, *children;
+		unsigned int n;
+
+		info.info.x11.lock_func();
+
+/* find the root window */
+		if (XQueryTree(info.info.x11.display, info.info.x11.wmwindow, &root, &parent, &children, &n)) {
+			if (children != NULL)
+				XFree(children);
+
+/* get width and height of the root window */
+			if (XGetWindowAttributes(info.info.x11.display, root, &attrs)) {
+				*w = attrs.width;
+				*h = attrs.height;
+			}
+		}
+		info.info.x11.unlock_func();
+	}
+}
+
+void create_window(void) {
+SDL_SysWMinfo info;
+int xres, yres;
+
+	get_display_res(&xres, &yres);
+
+	screen_width = xres * 0.6f;
 	screen_height = screen_width * 0.4f;
 
 	SDK_window_hints(SDL_NOFRAME);
@@ -96,8 +126,8 @@ SDL_SysWMinfo info;
 		printf("TD root window size [%d, %d]\n", attrs.width, attrs.height);
 */
 /* center window on screen */
-		window_x = (max_xres - screen_width) / 2;
-		window_y = (max_yres - screen_height) / 2;
+		window_x = (xres - screen_width) / 2;
+		window_y = (yres - screen_height) / 2;
 
 		info.info.x11.lock_func();
 
