@@ -11,6 +11,8 @@
 
 #define FPS				30
 
+extern int screen_width;
+extern int screen_height;
 extern int window_x;
 extern int window_y;
 

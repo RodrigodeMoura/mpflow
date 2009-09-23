@@ -72,29 +72,41 @@ void key_event(SDK_Event state, int key) {
 }
 
 /*
-	mouse position (x, y) is relative to application window, so from (0, 0) to (window_width, window_height)
+	get absolute screen coordinates for the mouse position
+*/
+void get_abs_mouse(int *mouse_x, int *mouse_y) {
+SDL_SysWMinfo info;
+
+	SDL_VERSION(&info.version);
+
+	if (SDL_GetWMInfo(&info) > 0 && info.subsystem == SDL_SYSWM_X11) {
+		Window root_window, child_window;
+		int a, b;
+		unsigned int u;
+
+		info.info.x11.lock_func();
+
+		XQueryPointer(info.info.x11.display, info.info.x11.wmwindow, &root_window, &child_window, mouse_x, mouse_y, &a, &b, &u);
+
+		info.info.x11.unlock_func();
+	}
+}
+
+/*
+	SDL mouse position (x, y) is relative to application window, so from (0, 0) to (window_width, window_height)
+	for window dragging, this is not good enough, because the moving the window and reading the relative mouse position
+	is causing "jumps" in mouse coordinates (due to 'resonation'?)
+	To fix this, read the absolute screen coordinates for the mouse instead. SDL can not do this;
+	use Xlib function XQueryPointer() instead
+	Window dragging is now rock solid :)
 */
 void mouse_event(SDK_Event event, int buttons, int x, int y) {
-SDL_SysWMinfo info;
-Window root_window, child_window;
-int a, b;
-unsigned int u;
-
 	switch(event) {
 		case SDK_PRESS:
-			printf("TD mouse press at (%d, %d)\n", x, y);
-			mouse_drag = 1;
-
-			SDL_VERSION(&info.version);
-
-			if (SDL_GetWMInfo(&info) > 0 && info.subsystem == SDL_SYSWM_X11) {
-				info.info.x11.lock_func();
-
-				XQueryPointer(info.info.x11.display, info.info.x11.wmwindow, &root_window, &child_window, &drag_x, &drag_y, &a, &b, &u);
-
-				info.info.x11.unlock_func();
+			if (y <= screen_height / 8) {			/* top of window activates window drag */
+				mouse_drag = 1;
+				get_abs_mouse(&drag_x, &drag_y);
 			}
-			printf("TD mouse abs [%d, %d]\n", drag_x, drag_y);
 			break;
 
 		case SDK_RELEASE:
@@ -105,16 +117,7 @@ unsigned int u;
 			if (mouse_drag) {
 				int new_x, new_y;
 
-				SDL_VERSION(&info.version);
-
-				if (SDL_GetWMInfo(&info) > 0 && info.subsystem == SDL_SYSWM_X11) {
-					info.info.x11.lock_func();
-
-					XQueryPointer(info.info.x11.display, info.info.x11.wmwindow, &root_window, &child_window, &new_x, &new_y, &a, &b, &u);
-
-					info.info.x11.unlock_func();
-				}
-				printf("TD mouse abs [%d, %d]\n", window_x + x, window_y + y);
+				get_abs_mouse(&new_x, &new_y);
 				move_app_window(window_x + (new_x - drag_x), window_y + (new_y - drag_y));
 				drag_x = new_x;
 				drag_y = new_y;
