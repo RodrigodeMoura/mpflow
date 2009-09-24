@@ -11,6 +11,7 @@
 #include "glut.h"
 #include "cover.h"
 #include "event.h"
+#include "mpdconf.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -298,6 +299,8 @@ void move(void) {
 }
 
 int main(int argc, char *argv[]) {
+	read_mpdconf();
+
 	SDK_init();
 
 	create_window();
