@@ -13,6 +13,7 @@ char *mpd_conf = "/etc/mpd.conf";
 char *music_dir = NULL;
 char *config_bind_address = "localhost";
 int config_port = 6600;
+char *config_password = NULL;
 
 
 /*
@@ -99,12 +100,31 @@ int lineno, len;
 				return -1;
 			}
 		}
+/* mpd passworded access */
+		if (!strcmp(buf, "password")) {
+			char *p2;
+
+			if (!*p) {
+				fprintf(stderr, "%s:%d: expected a password\n", mpd_conf, lineno);
+				fclose(f);
+				return -1;
+			}
+			if ((p2 = strchr(p, '@')) != NULL)
+				*p2 = 0;
+
+			if ((config_password = strdup(p)) == NULL) {
+				fprintf(stderr, "out of memory\n");
+				fclose(f);
+				return -1;
+			}
+		}
 	}
 	fclose(f);
 
 	printf("TD music_dir %s\n", music_dir);
 	printf("TD bind_address %s\n", config_bind_address);
 	printf("TD config_port %d\n", config_port);
+	printf("TD config_password %s\n", config_password);
 	return 0;
 }
 

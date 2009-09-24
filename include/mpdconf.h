@@ -8,6 +8,7 @@
 extern char *music_dir;
 extern char *config_bind_address;
 extern int config_port;
+extern char *config_password;
 
 int read_mpdconf(void);
 void set_conffile(char *);
