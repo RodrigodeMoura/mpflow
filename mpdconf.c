@@ -11,8 +11,8 @@
 
 char *mpd_conf = "/etc/mpd.conf";
 char *music_dir = NULL;
-char *config_bind_address = "localhost";
-int config_port = 6600;
+char *config_address = "localhost";
+char *config_port = "6600";
 char *config_password = NULL;
 
 
@@ -80,7 +80,7 @@ int lineno, len;
 				fclose(f);
 				return -1;
 			}
-			if ((config_bind_address = strdup(p)) == NULL) {
+			if ((config_address = strdup(p)) == NULL) {
 				fprintf(stderr, "out of memory\n");
 				fclose(f);
 				return -1;
@@ -93,9 +93,8 @@ int lineno, len;
 				fclose(f);
 				return -1;
 			}
-			config_port = (int)strtol(p, NULL, 10);
-			if (config_port <= 0) {
-				fprintf(stderr, "%s:%d: invalid port number\n", mpd_conf, lineno);
+			if ((config_port = strdup(p)) == NULL) {
+				fprintf(stderr, "out of memory\n");
 				fclose(f);
 				return -1;
 			}
@@ -122,8 +121,8 @@ int lineno, len;
 	fclose(f);
 
 	printf("TD music_dir %s\n", music_dir);
-	printf("TD bind_address %s\n", config_bind_address);
-	printf("TD config_port %d\n", config_port);
+	printf("TD config_address %s\n", config_address);
+	printf("TD config_port %s\n", config_port);
 	printf("TD config_password %s\n", config_password);
 	return 0;
 }

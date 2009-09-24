@@ -12,6 +12,7 @@
 #include "cover.h"
 #include "event.h"
 #include "mpdconf.h"
+#include "inet.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -298,8 +299,43 @@ void move(void) {
 	}
 }
 
+int connect_mpd(void) {
+int sock;
+char buf[1280], *rest;
+
+	sock = inet_connect(config_address, config_port);
+	inet_write(sock, "listall\n");
+	rest = NULL;
+
+	if (inet_readline(sock, buf, &rest, sizeof(buf)) == NULL)
+		fprintf(stderr, "error in connection to MPD\n");
+	else
+		if (strncmp(buf, "OK MPD ", 7)) {
+			fprintf(stderr, "error: the service we connected to does not look like MPD\n");
+			inet_close(sock);
+			return -1;
+		}
+
+	while(inet_readline(sock, buf, &rest, sizeof(buf)) != NULL) {
+		if (!strncmp(buf, "directory: ", 11)) {
+			printf("TD got directory [%s]\n", buf+11);
+			continue;
+		}
+		if (!strcmp(buf, "OK")) {
+			inet_write(sock, "close\n");
+			printf("TD write: close\n");
+			continue;
+		}
+	}
+	inet_close(sock);
+	return 0;
+}
+
 int main(int argc, char *argv[]) {
 	read_mpdconf();
+
+	if (connect_mpd())
+		return -1;
 
 	SDK_init();
 
