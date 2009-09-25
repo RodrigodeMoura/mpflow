@@ -12,6 +12,7 @@
 #define Z_FAR			160
 
 #define FPS				30
+#define FRAME_DELAY		(1000 / FPS)
 
 extern int screen_width;
 extern int screen_height;

@@ -298,7 +298,11 @@ int main(int argc, char *argv[]) {
 	for(;;) {
 		SDK_handle_events();
 		move();
-		SDK_sleep(50);
+
+		if (!moving)
+			SDL_WaitEvent(NULL);
+		else
+			SDK_sleep(FRAME_DELAY);
 	}
 	return 0;
 }
