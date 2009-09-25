@@ -12,6 +12,7 @@ extern int key_down;
 extern int moving;
 
 void init_events(void);
+void move(void);
 
 #endif	/* EVENT_H_WJ109 */
 

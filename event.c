@@ -8,6 +8,7 @@
 #include "SDK.h"
 #include "main.h"
 #include "SDL_syswm.h"
+#include "cover.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -60,6 +61,38 @@ void key_event(SDK_Event state, int key) {
 	} else {
 		key_down = 0;
 		handle_keyrelease(key);
+	}
+}
+
+void move(void) {
+	if (!moving) {
+/* TODO increase flipping speed to a certain maximum */
+		switch(key_down) {
+			case SDK_LEFT:
+				moving = MOVE_LEFT;
+				break;
+
+			case SDK_RIGHT:
+				moving = MOVE_RIGHT;
+				break;
+
+			default:
+				;
+		}
+	}
+	switch(moving) {
+		case MOVE_LEFT:
+			move_covers_left();
+			draw();
+			break;
+
+		case MOVE_RIGHT:
+			move_covers_right();
+			draw();
+			break;
+
+		default:
+			;
 	}
 }
 

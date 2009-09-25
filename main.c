@@ -223,55 +223,45 @@ void draw(void) {
 	SDK_swapbuffers();
 }
 
-void move(void) {
-	if (!moving) {
-/* TODO increase flipping speed to a certain maximum */
-		switch(key_down) {
-			case SDK_LEFT:
-				moving = MOVE_LEFT;
-				break;
-
-			case SDK_RIGHT:
-				moving = MOVE_RIGHT;
-				break;
-
-			default:
-				;
-		}
-	}
-	switch(moving) {
-		case MOVE_LEFT:
-			move_covers_left();
-			draw();
-			break;
-
-		case MOVE_RIGHT:
-			move_covers_right();
-			draw();
-			break;
-
-		default:
-			;
-	}
-}
-
 int connect_mpd(void) {
 int sock;
 char buf[1280], *rest;
 
 	sock = inet_connect(config_address, config_port);
-	inet_write(sock, "listall\n");
-	rest = NULL;
 
-	if (inet_readline(sock, buf, &rest, sizeof(buf)) == NULL)
+/* MPD announces itself; read first line */
+	rest = NULL;
+	if (inet_readline(sock, buf, &rest, sizeof(buf)) == NULL) {
 		fprintf(stderr, "error in connection to MPD\n");
-	else {
-		if (strncmp(buf, "OK MPD ", 7)) {
-			fprintf(stderr, "error: the service we connected to does not look like MPD\n");
+		inet_close(sock);
+		return -1;
+	}
+	if (strncmp(buf, "OK MPD ", 7)) {
+		fprintf(stderr, "error: the service we connected to does not look like MPD\n");
+		inet_close(sock);
+		return -1;
+	}
+/* authenticate */
+	if (config_password != NULL) {
+		snprintf(buf, sizeof(buf), "password %s\n", config_password);
+		inet_write(sock, buf);
+
+		rest = NULL;
+		if (inet_readline(sock, buf, &rest, sizeof(buf)) == NULL) {
+			fprintf(stderr, "error in connection to MPD\n");
+			inet_close(sock);
+			return -1;
+		}
+		if (strncmp(buf, "OK", 2)) {
+			fprintf(stderr, "error: wrong password for MPD\n");
 			inet_close(sock);
 			return -1;
 		}
 	}
+/* get all directories */
+	inet_write(sock, "listall\n");
+
+	rest = NULL;
 	while(inet_readline(sock, buf, &rest, sizeof(buf)) != NULL) {
 		if (!strncmp(buf, "directory: ", 11)) {
 			add_directory(buf+11);

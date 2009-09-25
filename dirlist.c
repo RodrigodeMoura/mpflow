@@ -16,7 +16,7 @@
 const char *album_art[] = {
 	"cover.jpg",
 	"Folder.jpg",
-	"AlbumArt.jpg"
+	"AlbumArtSmall.jpg",
 };
 
 const char *no_album_art = "";
