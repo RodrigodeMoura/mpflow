@@ -10,7 +10,7 @@
 
 
 char *mpd_conf = "/etc/mpd.conf";
-char *music_dir = NULL;
+char *config_musicdir = NULL;
 char *config_address = "localhost";
 char *config_port = "6600";
 char *config_password = NULL;
@@ -67,7 +67,7 @@ int lineno, len;
 				fclose(f);
 				return -1;
 			}
-			if ((music_dir = strdup(p)) == NULL) {
+			if ((config_musicdir = strdup(p)) == NULL) {
 				fprintf(stderr, "out of memory\n");
 				fclose(f);
 				return -1;
@@ -120,7 +120,7 @@ int lineno, len;
 	}
 	fclose(f);
 
-	printf("TD music_dir %s\n", music_dir);
+	printf("TD config_musicdir %s\n", config_musicdir);
 	printf("TD config_address %s\n", config_address);
 	printf("TD config_port %s\n", config_port);
 	printf("TD config_password %s\n", config_password);

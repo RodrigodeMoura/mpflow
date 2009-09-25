@@ -13,6 +13,7 @@
 #include "event.h"
 #include "mpdconf.h"
 #include "inet.h"
+#include "dirlist.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -309,21 +310,21 @@ char buf[1280], *rest;
 
 	if (inet_readline(sock, buf, &rest, sizeof(buf)) == NULL)
 		fprintf(stderr, "error in connection to MPD\n");
-	else
+	else {
 		if (strncmp(buf, "OK MPD ", 7)) {
 			fprintf(stderr, "error: the service we connected to does not look like MPD\n");
 			inet_close(sock);
 			return -1;
 		}
-
+	}
 	while(inet_readline(sock, buf, &rest, sizeof(buf)) != NULL) {
 		if (!strncmp(buf, "directory: ", 11)) {
 			printf("TD got directory [%s]\n", buf+11);
+			add_directory(buf+11);
 			continue;
 		}
 		if (!strcmp(buf, "OK")) {
 			inet_write(sock, "close\n");
-			printf("TD write: close\n");
 			continue;
 		}
 	}
