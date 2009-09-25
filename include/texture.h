@@ -7,7 +7,7 @@
 
 #include "SDK.h"
 
-#define DEFAULT_FOLDER_JPG	"mpflow_folder.jpg"
+#define DEFAULT_FOLDER_IMG	"mpflow_folder.png"
 
 #define NUM_TEXTURES		14
 #define TEX_DEFAULT_FOLDER	(NUM_TEXTURES-1)
