@@ -6,6 +6,8 @@
 #include "SDK.h"
 #include "main.h"
 #include "event.h"
+#include "mpdconf.h"
+#include "texture.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,13 +15,21 @@
 
 Cover covers[NUM_COVERS];
 
-extern GLuint textures[NUM_COVERS];
 
+static void load_cover_texture(Cover *c) {
+char filename[1024];
+
+	find_album_art(c->dirlist);
+
+	snprintf(filename, sizeof(filename), "%s/%s/%s", config_musicdir, c->dirlist->path, c->dirlist->img);
+	load_texture(c->texture_idx, filename);
+}
 
 void init_covers(void) {
 int i;
 float xpos, ypos, color;
 DirList *d;
+char filename[1024];
 
 /* left side */
 	xpos = ARENA_WIDTH * 0.5f - CENTER_SPACE - 5 * COVER_DISTANCE;
@@ -32,7 +42,6 @@ DirList *d;
 	covers[0].angle = COVER_ANGLE;
 	covers[0].color = color;
 	covers[0].pos = 0;
-	covers[0].texture_idx = 0;
 
 	for(i = 1; i < CENTER_COVER; i++) {
 		covers[i].x = xpos;
@@ -41,7 +50,6 @@ DirList *d;
 		covers[i].angle = COVER_ANGLE;
 		covers[i].color = color;
 		covers[i].pos = i;
-		covers[i].texture_idx = 0;
 
 		xpos += COVER_DISTANCE;
 		color += 0.1f;
@@ -56,7 +64,6 @@ DirList *d;
 	covers[NUM_COVERS-1].z = COVER_Z;
 	covers[NUM_COVERS-1].angle = -COVER_ANGLE;
 	covers[NUM_COVERS-1].color = color;
-	covers[NUM_COVERS-1].texture_idx = 0;
 
 	for(i = NUM_COVERS-2; i > CENTER_COVER; i--) {
 		covers[i].x = xpos;
@@ -65,7 +72,6 @@ DirList *d;
 		covers[i].angle = -COVER_ANGLE;
 		covers[i].color = color;
 		covers[i].pos = i;
-		covers[i].texture_idx = 0;
 
 		xpos -= COVER_DISTANCE;
 		color += 0.1f;
@@ -78,7 +84,6 @@ DirList *d;
 	covers[CENTER_COVER].angle = 0;
 	covers[CENTER_COVER].color = 1;
 	covers[CENTER_COVER].pos = CENTER_COVER;
-	covers[CENTER_COVER].texture_idx = 0;
 
 /* set dirlist pointer */
 	d = get_dirlist();
@@ -91,38 +96,49 @@ DirList *d;
 		covers[i].dirlist = d;
 		d = d->next;
 	}
-	for(i = 0; i < NUM_COVERS; i++)
-		find_album_art(covers[i].dirlist);
+/* make textures */
+	init_textures();
+
+	for(i = 0; i < NUM_COVERS; i++) {
+		covers[i].texture_idx = i;
+		load_cover_texture(&covers[i]);
+	}
 }
 
 static void shift_covers_left(void) {
-int i;
+int i, tex_id;
 
-/* TODO delete texture covers[0] */
+	tex_id = covers[0].texture_idx;
+	delete_texture(tex_id);
 
 	memmove(&covers[0], &covers[1], sizeof(Cover) * (NUM_COVERS-1));
 
 	for(i = 0; i < NUM_COVERS; i++)
 		covers[i].pos = i;
 
+	covers[NUM_COVERS-1].texture_idx = tex_id;
 	covers[NUM_COVERS-1].dirlist = covers[NUM_COVERS-1].dirlist->next;
-	find_album_art(covers[NUM_COVERS-1].dirlist);
-/* TODO insert new texture at covers[NUM_COVERS-1] */
+
+	create_texture(tex_id);
+	load_cover_texture(&covers[NUM_COVERS-1]);
 }
 
 static void shift_covers_right(void) {
-int i;
+int i, tex_id;
 
-/* TODO delete texture covers[NUM_COVERS-1] */
+	tex_id = covers[NUM_COVERS-1].texture_idx;
+	delete_texture(tex_id);
 
 	memmove(&covers[1], &covers[0], sizeof(Cover) * (NUM_COVERS-1));
 
 	for(i = 0; i < NUM_COVERS; i++)
 		covers[i].pos = i;
 
+	covers[0].texture_idx = tex_id;
 	covers[0].dirlist = covers[0].dirlist->prev;
-	find_album_art(covers[0].dirlist);
-/* TODO insert new texture at covers[0] */
+
+	create_texture(tex_id);
+	load_cover_texture(&covers[0]);
 }
 
 void move_cover_left(Cover *c) {
@@ -332,7 +348,7 @@ GLfloat tex_reflect[8] = {
 
 	glEnable(GL_TEXTURE_2D);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	glBindTexture(GL_TEXTURE_2D, textures[c->texture_idx]);
+	bind_texture(c->texture_idx);
 
 	glVertexPointer(2, GL_FLOAT, 0, vertex_arr);
 	glTexCoordPointer(2, GL_FLOAT, 0, tex_arr);

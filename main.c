@@ -6,7 +6,6 @@
 
 #include "main.h"
 #include "SDK.h"
-#include "SDL_image.h"
 #include "SDL_syswm.h"
 #include "glut.h"
 #include "cover.h"
@@ -25,8 +24,6 @@ int window_x, window_y;					/* window position */
 
 int max_xres = 320, max_yres = 200;		/* maximum display resolution (as reported by SDK_max_videomode()) */
 int display_xres, display_yres;			/* current display resolution */
-
-GLuint textures[11];
 
 
 void draw(void);
@@ -166,57 +163,6 @@ SDL_SysWMinfo info;
 	}
 }
 
-
-int create_texture(SDL_Surface *img, GLuint tex_id) {
-int format;
-
-	switch(img->format->BytesPerPixel) {
-		case 1:								/* grayscale jpg? */
-			format = GL_COLOR_INDEX;		/* so, this is probaby wrong ... */
-			break;
-
-		case 3:
-			format = GL_RGB;
-			break;
-
-		case 4:
-			format = GL_RGBA;
-			break;
-
-		default:
-			format = -1;		/* invalid */
-			fprintf(stderr, "create_texture(): invalid pixel format\n");
-			return -1;
-	}
-	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, tex_id);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-/*
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, img->w, img->h, format, GL_UNSIGNED_BYTE, img->pixels);
-*/
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img->w, img->h, 0, format, GL_UNSIGNED_BYTE, img->pixels);
-
-	glDisable(GL_TEXTURE_2D);
-	return 0;
-}
-
-void load(void) {
-SDL_Surface *img;
-
-	if ((img = IMG_Load("/media/idisk/mp3/Muse/The Resistance/cover.jpg")) == NULL) {
-		fprintf(stderr, "error: failed to load image\n");
-		return;
-	}
-/* make GL texture */
-
-	glGenTextures(1, textures);
-	create_texture(img, textures[0]);
-
-	SDL_FreeSurface(img);
-}
-
 /*
 	draw white frame around window
 */
@@ -346,8 +292,6 @@ int main(int argc, char *argv[]) {
 
 	init_gl();
 	init_covers();
-	load();
-
 	init_events();
 
 	draw();
