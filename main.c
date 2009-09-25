@@ -2,10 +2,9 @@
 	mpflow	WJ109
 */
 
-/* TODO mouse drag window: mouse_down in top van window; XQueryPointer gebruiken, en dan XMoveWindow met pos+dx, dy offset */
-
 #include "main.h"
 #include "SDK.h"
+#include "SDL_image.h"
 #include "SDL_syswm.h"
 #include "glut.h"
 #include "cover.h"
@@ -139,6 +138,16 @@ int xres, yres;
 		window_x = window_y = 0;
 }
 
+void set_app_icon(void) {
+SDL_Surface *icon;
+
+	if ((icon = IMG_Load(APP_ICON)) == NULL)
+		return;
+
+	SDL_WM_SetIcon(icon, NULL);
+	SDL_FreeSurface(icon);
+}
+
 /*
 	move application to screen coordinates (x, y)
 	This is used for window dragging
@@ -265,7 +274,6 @@ char buf[1280], *rest;
 	}
 	while(inet_readline(sock, buf, &rest, sizeof(buf)) != NULL) {
 		if (!strncmp(buf, "directory: ", 11)) {
-			printf("TD got directory [%s]\n", buf+11);
 			add_directory(buf+11);
 			continue;
 		}
@@ -289,6 +297,7 @@ int main(int argc, char *argv[]) {
 	SDK_init();
 
 	create_window();
+	set_app_icon();
 
 	init_gl();
 	init_covers();
