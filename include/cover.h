@@ -5,6 +5,8 @@
 #ifndef COVER_H_WJ109
 #define COVER_H_WJ109	1
 
+#include "dirlist.h"
+
 #define CENTER_COVER	6
 #define NUM_COVERS		(CENTER_COVER*2 + 1)
 
@@ -18,6 +20,7 @@
 typedef struct {
 	float x, y, z, angle, color;
 	int pos, texture_idx;
+	DirList *dirlist;
 } Cover;
 
 extern Cover covers[NUM_COVERS];

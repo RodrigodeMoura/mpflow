@@ -13,12 +13,13 @@
 
 Cover covers[NUM_COVERS];
 
-extern GLuint textures[11];
+extern GLuint textures[NUM_COVERS];
 
 
 void init_covers(void) {
 int i;
 float xpos, ypos, color;
+DirList *d;
 
 /* left side */
 	xpos = ARENA_WIDTH * 0.5f - CENTER_SPACE - 5 * COVER_DISTANCE;
@@ -78,6 +79,20 @@ float xpos, ypos, color;
 	covers[CENTER_COVER].color = 1;
 	covers[CENTER_COVER].pos = CENTER_COVER;
 	covers[CENTER_COVER].texture_idx = 0;
+
+/* set dirlist pointer */
+	d = get_dirlist();
+	for(i = CENTER_COVER; i >= 0; i--) {
+		covers[i].dirlist = d;
+		d = d->prev;
+	}
+	d = get_dirlist();
+	for(i = CENTER_COVER; i < NUM_COVERS; i++) {
+		covers[i].dirlist = d;
+		d = d->next;
+	}
+	for(i = 0; i < NUM_COVERS; i++)
+		find_album_art(covers[i].dirlist);
 }
 
 static void shift_covers_left(void) {
@@ -90,6 +105,8 @@ int i;
 	for(i = 0; i < NUM_COVERS; i++)
 		covers[i].pos = i;
 
+	covers[NUM_COVERS-1].dirlist = covers[NUM_COVERS-1].dirlist->next;
+	find_album_art(covers[NUM_COVERS-1].dirlist);
 /* TODO insert new texture at covers[NUM_COVERS-1] */
 }
 
@@ -103,6 +120,8 @@ int i;
 	for(i = 0; i < NUM_COVERS; i++)
 		covers[i].pos = i;
 
+	covers[0].dirlist = covers[0].dirlist->prev;
+	find_album_art(covers[0].dirlist);
 /* TODO insert new texture at covers[0] */
 }
 
@@ -181,6 +200,7 @@ int i, anim_done;
 	if (anim_done >= NUM_COVERS-3) {
 		moving = 0;
 		shift_covers_left();
+		printf("TD current == %s\n", covers[CENTER_COVER].dirlist->name);
 	}
 }
 
@@ -259,6 +279,7 @@ int i, anim_done;
 	if (anim_done >= NUM_COVERS-3) {
 		moving = 0;
 		shift_covers_right();
+		printf("TD current == %s\n", covers[CENTER_COVER].dirlist->name);
 	}
 }
 

@@ -21,9 +21,9 @@ void add_DirList(DirList *);
 
 void add_directory(char *);
 
+void find_album_art(DirList *);
 void init_current_DirList(void);
-void move_DirList_left(void);
-void move_DirList_right(void);
+DirList *get_dirlist(void);
 
 #endif	/* DIRLIST_H_WJ109 */
 
