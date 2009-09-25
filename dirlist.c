@@ -21,7 +21,8 @@ const char *album_art[] = {
 
 const char *no_album_art = "";
 
-DirList *root_dirlist = NULL;
+static DirList *root_dirlist = NULL;
+static DirList *current_dirlist = NULL;
 
 
 DirList *new_DirList(void) {
@@ -112,11 +113,48 @@ int i, num;
 
 		if (!stat(filename, &statbuf) && S_ISREG(statbuf.st_mode)) {
 			d->img = album_art[i];
-			printf("TD %s\n", filename);
+			printf("TD album art: %s\n", filename);
 			return;
 		}
 	}
 	d->img = no_album_art;
+}
+
+void init_current_DirList(void) {
+DirList *d;
+int n;
+
+	n = 0;
+	for(d = root_dirlist; d != NULL; d = d->next) {
+		n++;
+
+/* make cycling chain */
+		if (d->next == NULL) {
+			d->next = root_dirlist;
+			root_dirlist->prev = d;
+			break;
+		}
+	}
+/* center the cursor */
+	n /= 2;
+	for(d = root_dirlist; n > 0; n--)
+		d = d->next;
+
+	current_dirlist = d;
+}
+
+void move_DirList_left(void) {
+	find_album_art(current_dirlist->next->next->next->next->next->next);
+
+	current_dirlist = current_dirlist->prev;
+	printf("TD current == %s\n", current_dirlist->name);
+}
+
+void move_DirList_right(void) {
+	find_album_art(current_dirlist->prev->prev->prev->prev->prev->prev);
+
+	current_dirlist = current_dirlist->next;
+	printf("TD current == %s\n", current_dirlist->name);
 }
 
 /* EOB */

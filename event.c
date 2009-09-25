@@ -7,6 +7,7 @@
 #include "event.h"
 #include "SDK.h"
 #include "main.h"
+#include "dirlist.h"
 #include "SDL_syswm.h"
 
 #include <stdio.h>
@@ -26,21 +27,17 @@ void handle_keypress(int key) {
 			break;
 
 		case SDK_LEFT:
-			if (!moving)
+			if (!moving) {
 				moving = MOVE_LEFT;
+				move_DirList_left();
+			}
 			break;
 
 		case SDK_RIGHT:
-			if (!moving)
+			if (!moving) {
 				moving = MOVE_RIGHT;
-			break;
-
-		case SDK_BACKSPACE:
-			move_app_window(-10, 0);
-			break;
-
-		case SDK_SPACE:
-			move_app_window(10, 0);
+				move_DirList_right();
+			}
 			break;
 
 		default:

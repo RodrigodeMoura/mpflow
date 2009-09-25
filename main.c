@@ -329,6 +329,8 @@ char buf[1280], *rest;
 		}
 	}
 	inet_close(sock);
+
+	init_current_DirList();
 	return 0;
 }
 

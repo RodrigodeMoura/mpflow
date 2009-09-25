@@ -21,6 +21,10 @@ void add_DirList(DirList *);
 
 void add_directory(char *);
 
+void init_current_DirList(void);
+void move_DirList_left(void);
+void move_DirList_right(void);
+
 #endif	/* DIRLIST_H_WJ109 */
 
 /* EOB */
