@@ -5,6 +5,7 @@
 #ifndef COVER_H_WJ109
 #define COVER_H_WJ109	1
 
+#include "main.h"
 #include "dirlist.h"
 
 #define CENTER_COVER	6
@@ -16,6 +17,10 @@
 #define COVER_ANGLE		60.0f
 #define COVER_DISTANCE	(COVER_W * 0.125f)
 #define CENTER_SPACE	(COVER_W * 0.75f)
+
+#define FLIP_SPEED		(FPS * 0.2f)
+#define FLIP_SPEED_FAST	(FPS * 0.07f)
+#define SPEEDUP_DELAY	1600
 
 typedef struct {
 	float x, y, z, angle, color;

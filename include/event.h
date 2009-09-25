@@ -10,6 +10,7 @@
 
 extern int key_down;
 extern int moving;
+extern unsigned int ticks_moving;
 
 void init_events(void);
 void move(void);

@@ -16,6 +16,7 @@
 
 int key_down;
 int moving;
+unsigned int ticks_moving;
 
 static int mouse_drag, drag_x, drag_y;
 
@@ -24,29 +25,6 @@ void handle_keypress(int key) {
 	switch(key) {
 		case SDK_ESC:
 			SDK_exit(0);
-			break;
-
-		case SDK_LEFT:
-			if (!moving)
-				moving = MOVE_LEFT;
-			break;
-
-		case SDK_RIGHT:
-			if (!moving)
-				moving = MOVE_RIGHT;
-			break;
-
-		default:
-			;
-	}
-}
-
-void handle_keyrelease(int key) {
-	switch(key) {
-		case SDK_LEFT:
-			break;
-
-		case SDK_RIGHT:
 			break;
 
 		default:
@@ -58,22 +36,22 @@ void key_event(SDK_Event state, int key) {
 	if (state == SDK_PRESS) {
 		key_down = key;
 		handle_keypress(key);
-	} else {
+	} else
 		key_down = 0;
-		handle_keyrelease(key);
-	}
 }
 
 void move(void) {
-	if (!moving) {
 /* TODO increase flipping speed to a certain maximum */
+	if (!moving) {
 		switch(key_down) {
 			case SDK_LEFT:
 				moving = MOVE_LEFT;
+				ticks_moving = SDK_ticks();
 				break;
 
 			case SDK_RIGHT:
 				moving = MOVE_RIGHT;
+				ticks_moving = SDK_ticks();
 				break;
 
 			default:
@@ -93,6 +71,21 @@ void move(void) {
 
 		default:
 			;
+	}
+/* moving may have been reset */
+	if (!moving) {
+		switch(key_down) {
+			case SDK_LEFT:
+				moving = MOVE_LEFT;
+				break;
+
+			case SDK_RIGHT:
+				moving = MOVE_RIGHT;
+				break;
+
+			default:
+				;
+		}
 	}
 }
 
@@ -172,6 +165,7 @@ void window_event(SDK_Event event, int w, int h) {
 void init_events(void) {
 	key_down = 0;
 	moving = 0;
+	ticks_moving = 0;
 
 	mouse_drag = 0;
 

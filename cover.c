@@ -149,7 +149,10 @@ int i, anim_done;
 	if (!moving)
 		return;
 
-	speed = FPS * 0.2f;
+	if (SDK_ticks() - ticks_moving > SPEEDUP_DELAY)
+		speed = FLIP_SPEED_FAST;
+	else
+		speed = FLIP_SPEED;
 
 	step_z = 0.0f;
 	step_angle = 0.0f;
@@ -217,7 +220,6 @@ int i, anim_done;
 	if (anim_done >= NUM_COVERS-3) {
 		moving = 0;
 		shift_covers_left();
-		printf("TD current == %s\n", covers[CENTER_COVER].dirlist->name);
 	}
 }
 
@@ -228,7 +230,10 @@ int i, anim_done;
 	if (!moving)
 		return;
 
-	speed = FPS * 0.2f;
+	if (SDK_ticks() - ticks_moving > SPEEDUP_DELAY)
+		speed = FLIP_SPEED_FAST;
+	else
+		speed = FLIP_SPEED;
 
 	step_z = 0.0f;
 	step_angle = 0.0f;
@@ -296,7 +301,6 @@ int i, anim_done;
 	if (anim_done >= NUM_COVERS-3) {
 		moving = 0;
 		shift_covers_right();
-		printf("TD current == %s\n", covers[CENTER_COVER].dirlist->name);
 	}
 }
 
