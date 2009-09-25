@@ -18,7 +18,7 @@ int key_down;
 int moving;
 unsigned int ticks_moving;
 
-static int mouse_drag, drag_x, drag_y;
+static int mouse_drag, window_drag, drag_x, drag_y;
 
 
 void handle_keypress(int key) {
@@ -122,23 +122,48 @@ void mouse_event(SDK_Event event, int buttons, int x, int y) {
 	switch(event) {
 		case SDK_PRESS:
 			if (y <= screen_height / 8) {			/* top of window activates window drag */
-				mouse_drag = 1;
+				window_drag = 1;
 				get_abs_mouse(&drag_x, &drag_y);
+			} else {
+				if (x < screen_width / 3) {
+					key_down = SDK_RIGHT;
+					mouse_drag = 1;
+				} else {
+					if (x > screen_width - screen_width / 3) {
+						key_down = SDK_LEFT;
+						mouse_drag = 1;
+					}
+				}
 			}
 			break;
 
 		case SDK_RELEASE:
-			mouse_drag = 0;
+			window_drag = mouse_drag = 0;
+			key_down = 0;
 			break;
 
 		case SDK_MOUSEMOVE:
-			if (mouse_drag) {
+			if (window_drag) {
 				int new_x, new_y;
 
 				get_abs_mouse(&new_x, &new_y);
 				move_app_window(window_x + (new_x - drag_x), window_y + (new_y - drag_y));
 				drag_x = new_x;
 				drag_y = new_y;
+			} else {
+				if (mouse_drag) {
+					int k;
+
+					if (x < screen_width / 2)
+						k = SDK_RIGHT;
+					else
+						k = SDK_LEFT;
+
+					if (k != key_down) {
+						key_down = k;
+						ticks_moving = SDK_ticks();
+					}
+				}
 			}
 			break;
 
@@ -167,7 +192,7 @@ void init_events(void) {
 	moving = 0;
 	ticks_moving = 0;
 
-	mouse_drag = 0;
+	mouse_drag = window_drag = 0;
 
 	SDK_key_event(key_event);
 	SDK_mouse_event(mouse_event);
