@@ -112,12 +112,10 @@ int i, num;
 
 		if (!stat(filename, &statbuf) && S_ISREG(statbuf.st_mode)) {
 			d->img = album_art[i];
-			printf("TD album art: %s\n", filename);
 			return;
 		}
 	}
 	d->img = no_album_art;
-	printf("TD no album art found\n");
 }
 
 void init_current_DirList(void) {

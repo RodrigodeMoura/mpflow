@@ -14,6 +14,8 @@ static GLuint textures[NUM_TEXTURES];
 
 void init_textures(void) {
 	glGenTextures(NUM_TEXTURES, textures);
+
+	load_texture(TEX_DEFAULT_FOLDER, DEFAULT_FOLDER_JPG);
 }
 
 static int load_texture_img(SDL_Surface *img, GLuint tex_id) {

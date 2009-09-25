@@ -17,19 +17,20 @@ Cover covers[NUM_COVERS];
 
 
 static void load_cover_texture(Cover *c) {
-char filename[1024];
-
 	find_album_art(c->dirlist);
 
-	snprintf(filename, sizeof(filename), "%s/%s/%s", config_musicdir, c->dirlist->path, c->dirlist->img);
-	load_texture(c->texture_idx, filename);
+	if (c->dirlist->img != NULL && c->dirlist->img[0]) {
+		char filename[1024];
+
+		snprintf(filename, sizeof(filename), "%s/%s/%s", config_musicdir, c->dirlist->path, c->dirlist->img);
+		load_texture(c->texture_idx, filename);
+	}
 }
 
 void init_covers(void) {
 int i;
 float xpos, ypos, color;
 DirList *d;
-char filename[1024];
 
 /* left side */
 	xpos = ARENA_WIDTH * 0.5f - CENTER_SPACE - 5 * COVER_DISTANCE;
@@ -348,7 +349,11 @@ GLfloat tex_reflect[8] = {
 
 	glEnable(GL_TEXTURE_2D);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	bind_texture(c->texture_idx);
+
+	if (c->dirlist->img != NULL && c->dirlist->img[0])
+		bind_texture(c->texture_idx);
+	else
+		bind_texture(TEX_DEFAULT_FOLDER);
 
 	glVertexPointer(2, GL_FLOAT, 0, vertex_arr);
 	glTexCoordPointer(2, GL_FLOAT, 0, tex_arr);

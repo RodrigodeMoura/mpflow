@@ -7,7 +7,10 @@
 
 #include "SDK.h"
 
-#define NUM_TEXTURES	11
+#define DEFAULT_FOLDER_JPG	"mpflow_folder.jpg"
+
+#define NUM_TEXTURES		14
+#define TEX_DEFAULT_FOLDER	(NUM_TEXTURES-1)
 
 void init_textures(void);
 void load_texture(int, char *);
