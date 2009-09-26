@@ -71,7 +71,6 @@ GLint viewport[4];
 		center_cover.w = (int)win_x - center_cover.x;
 		center_cover.h = (int)win_y - center_cover.y;
 	}
-printf("TD center_cover [%d, %d, %d, %d]\n", center_cover.x, center_cover.y, center_cover.w, center_cover.h);
 }
 
 void init_covers(void) {

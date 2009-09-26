@@ -5,6 +5,7 @@
 #ifndef MPD_H_WJ109
 #define MPD_H_WJ109	1
 
+int init_mpd(void);
 int mpd_connect(void);
 int mpd_listdir(int);
 void mpd_close(int);

@@ -12,6 +12,29 @@
 #include <string.h>
 
 
+/*
+	init MPD related stuff, read dir listing, etc.
+*/
+int init_mpd(void) {
+int sock;
+char path[1024];
+
+/* get MPD config parameters like bind_address, port, password */
+	read_mpdconf();
+
+/* get directory listing from MPD */
+	if ((sock = mpd_connect()) == -1)
+		return -1;
+
+	mpd_listdir(sock);
+	mpd_current_album(sock, path, sizeof(path));
+	mpd_close(sock);
+
+/* position current cover to the top album in the playlist */
+	find_dirlist(path);
+	return 0;
+}
+
 int mpd_connect(void) {
 int sock;
 char buf[1280], *rest;
