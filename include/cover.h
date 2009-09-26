@@ -5,6 +5,7 @@
 #ifndef COVER_H_WJ109
 #define COVER_H_WJ109	1
 
+#include "SDL.h"
 #include "main.h"
 #include "dirlist.h"
 
@@ -29,11 +30,7 @@ typedef struct {
 } Cover;
 
 extern Cover covers[NUM_COVERS];
-
-extern int center_cover_x;
-extern int center_cover_y;
-extern int center_cover_w;
-extern int center_cover_h;
+extern SDL_Rect center_cover;
 
 void init_covers(void);
 void move_covers_left(void);

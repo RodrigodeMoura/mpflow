@@ -18,7 +18,9 @@ int key_down;
 int moving;
 unsigned int ticks_moving;
 
-static int mouse_drag, window_drag, drag_x, drag_y;
+static int mouse_drag, window_drag, drag_x, drag_y, lpress_x, lpress_y;
+static unsigned int center_clicked = 0;
+static int scroll_wheel = 0;
 
 
 void handle_keypress(int key) {
@@ -74,6 +76,13 @@ void move(void) {
 	}
 /* moving may have been reset */
 	if (!moving) {
+		if (scroll_wheel > 0) {
+			scroll_wheel--;
+			if (!scroll_wheel) {
+				key_down = 0;
+				return;
+			}
+		}
 		switch(key_down) {
 			case SDK_LEFT:
 				moving = MOVE_LEFT;
@@ -87,6 +96,25 @@ void move(void) {
 				;
 		}
 	}
+}
+
+/*
+	see if a mouse click was in a particular area
+*/
+static int click_rect(SDL_Rect *r, int x, int y) {
+	if (x < r->x)
+		return 0;
+
+	if (x > r->x + r->w)
+		return 0;
+
+	if (y < r->y)
+		return 0;
+
+	if (y > r->y + r->h)
+		return 0;
+
+	return 1;
 }
 
 /*
@@ -121,26 +149,52 @@ SDL_SysWMinfo info;
 void mouse_event(SDK_Event event, int buttons, int x, int y) {
 	switch(event) {
 		case SDK_PRESS:
-printf("TD mouse press (%d, %d)\n", x, y);
-			if (y <= screen_height / 8) {			/* top of window activates window drag */
-				window_drag = 1;
-				get_abs_mouse(&drag_x, &drag_y);
-			} else {
-				if (x < screen_width / 3) {
-					key_down = SDK_RIGHT;
-					mouse_drag = 1;
+			if (buttons & SDK_MOUSE_LEFT) {
+				lpress_x = x;
+				lpress_y = y;
+
+				if (y <= screen_height / 8) {			/* top of window activates window drag */
+					window_drag = 1;
+					get_abs_mouse(&drag_x, &drag_y);
 				} else {
-					if (x > screen_width - screen_width / 3) {
-						key_down = SDK_LEFT;
+					if (x < screen_width / 3) {
+						key_down = SDK_RIGHT;
 						mouse_drag = 1;
+					} else {
+						if (x > screen_width - screen_width / 3) {
+							key_down = SDK_LEFT;
+							mouse_drag = 1;
+						}
 					}
 				}
+			}
+			if (buttons & SDK_MOUSE_WHEELUP) {
+				if (key_down != SDK_RIGHT)
+					scroll_wheel++;
+
+				key_down = SDK_LEFT;
+			}
+			if (buttons & SDK_MOUSE_WHEELDOWN) {
+				if (key_down != SDK_LEFT)
+					scroll_wheel++;
+
+				key_down = SDK_RIGHT;
 			}
 			break;
 
 		case SDK_RELEASE:
-			window_drag = mouse_drag = 0;
-			key_down = 0;
+			if (buttons & SDK_MOUSE_LEFT) {
+				window_drag = mouse_drag = 0;
+				key_down = 0;
+
+				if (click_rect(&center_cover, x, y) && click_rect(&center_cover, lpress_x, lpress_y)) {
+					printf("TD center cover clicked\n");
+					if (SDK_ticks() - center_clicked <= MOUSE_DOUBLECLICK) {
+						printf("TD double click\n");
+					}
+					center_clicked = SDK_ticks();
+				}
+			}
 			break;
 
 		case SDK_MOUSEMOVE:

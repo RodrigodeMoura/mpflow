@@ -19,7 +19,7 @@ Cover covers[NUM_COVERS];
 	window coordinates and dimension of the center cover in pixels
 	This is _not_ used by OpenGL, but is needed for the mouse
 */
-int center_cover_x, center_cover_y, center_cover_w, center_cover_h;
+SDL_Rect center_cover;
 
 
 static void load_cover_texture(Cover *c) {
@@ -41,7 +41,7 @@ static void get_cover_coords(void) {
 GLdouble model_matrix[16], project_matrix[16], obj_x, obj_y, obj_z, win_x, win_y, win_z;
 GLint viewport[4];
 
-	center_cover_x = center_cover_y = center_cover_w = center_cover_h = 0;
+	center_cover.x = center_cover.y = center_cover.w = center_cover.h = 0;
 
 	glLoadIdentity();
 	glTranslatef(-ARENA_WIDTH * 0.5f, -ARENA_HEIGHT * 0.5f, -180);
@@ -59,8 +59,8 @@ GLint viewport[4];
 	if (gluProject(obj_x, obj_y, obj_z, model_matrix, project_matrix, viewport, &win_x, &win_y, &win_z) == GL_FALSE)
 		fprintf(stderr, "error: gluProject() failed, unable to determine window coordinates for correct mouse handling\n");
 	else {
-		center_cover_x = (int)win_x;
-		center_cover_y = (int)win_y;
+		center_cover.x = (int)win_x;
+		center_cover.y = (int)win_y;
 	}
 	obj_x += COVER_W;
 	obj_y += COVER_H;
@@ -68,10 +68,10 @@ GLint viewport[4];
 	if (gluProject(obj_x, obj_y, obj_z, model_matrix, project_matrix, viewport, &win_x, &win_y, &win_z) == GL_FALSE)
 		fprintf(stderr, "error: gluProject() failed, unable to determine window coordinates for correct mouse handling\n");
 	else {
-		center_cover_w = (int)win_x - center_cover_x;
-		center_cover_h = (int)win_y - center_cover_y;
+		center_cover.w = (int)win_x - center_cover.x;
+		center_cover.h = (int)win_y - center_cover.y;
 	}
-printf("TD center_cover [%d, %d, %d, %d]\n", center_cover_x, center_cover_y, center_cover_w, center_cover_h);
+printf("TD center_cover [%d, %d, %d, %d]\n", center_cover.x, center_cover.y, center_cover.w, center_cover.h);
 }
 
 void init_covers(void) {

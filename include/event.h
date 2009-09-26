@@ -8,6 +8,8 @@
 #define MOVE_LEFT		1
 #define MOVE_RIGHT		2
 
+#define MOUSE_DOUBLECLICK	500			/* time in milliseconds */
+
 extern int key_down;
 extern int moving;
 extern unsigned int ticks_moving;
