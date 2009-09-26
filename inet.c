@@ -42,10 +42,9 @@ struct addrinfo hints, *result, *rp;
 	freeaddrinfo(result);
 
 	if (sock == -1) {
-		fprintf(stderr, "failed to connect to %s:%s\n", addr, service);
+		fprintf(stderr, "error: failed to connect to %s:%s\n", addr, service);
 		return -1;
 	}
-
 	return sock;
 }
 
