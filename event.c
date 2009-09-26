@@ -9,6 +9,7 @@
 #include "main.h"
 #include "SDL_syswm.h"
 #include "cover.h"
+#include "mpd.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -187,11 +188,11 @@ void mouse_event(SDK_Event event, int buttons, int x, int y) {
 				window_drag = mouse_drag = 0;
 				key_down = 0;
 
+/* double click on center cover plays the album */
 				if (click_rect(&center_cover, x, y) && click_rect(&center_cover, lpress_x, lpress_y)) {
-					printf("TD center cover clicked\n");
-					if (SDK_ticks() - center_clicked <= MOUSE_DOUBLECLICK) {
-						printf("TD double click\n");
-					}
+					if (SDK_ticks() - center_clicked <= MOUSE_DOUBLECLICK)
+						play_album(covers[CENTER_COVER].dirlist->path);
+
 					center_clicked = SDK_ticks();
 				}
 			}

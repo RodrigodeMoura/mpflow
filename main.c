@@ -224,8 +224,12 @@ void draw(void) {
 	SDK_swapbuffers();
 }
 
-int main(int argc, char *argv[]) {
+/*
+	init MPD related stuff, read dir listing, etc.
+*/
+void init_mpd(void) {
 int sock;
+char path[1024];
 
 /* get MPD config parameters like bind_address, port, password */
 	read_mpdconf();
@@ -235,7 +239,15 @@ int sock;
 		return -1;
 
 	mpd_listdir(sock);
+	mpd_current_album(sock, path, sizeof(path));
 	mpd_close(sock);
+
+/* position current cover to the top album in the playlist */
+	find_dirlist(path);
+}
+
+int main(int argc, char *argv[]) {
+	init_mpd();
 
 /* init app */
 	SDK_init();

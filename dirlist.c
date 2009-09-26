@@ -141,6 +141,27 @@ int n;
 	}
 }
 
+DirList *find_dirlist(char *path) {
+DirList *p;
+
+	if (path == NULL || !*path)
+		return NULL;
+
+	if (!strcmp(root_dirlist->path, path))
+		return root_dirlist;
+
+	if (root_dirlist->next == root_dirlist)
+		return NULL;
+
+	for(p = root_dirlist->next; p != root_dirlist; p = p->next) {
+		if (!strcmp(path, p->path)) {
+			root_dirlist = p;
+			return p;
+		}
+	}
+	return NULL;
+}
+
 DirList *get_dirlist(void) {
 	return root_dirlist;
 }
