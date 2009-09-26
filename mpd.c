@@ -144,6 +144,30 @@ char buf[1280], *rest, *p;
 
 	*album = 0;
 
+/* try currently playing song */
+	if (inet_write(sock, "currentsong\n") == -1) {
+		fprintf(stderr, "error in connection with MPD\n");
+		return -1;
+	}
+	rest = NULL;
+	while(inet_readline(sock, buf, &rest, sizeof(buf)) != NULL) {
+		if (!strncmp(buf, "file: ", 6)) {
+			if ((p = strrchr(buf, '/')) != NULL)
+				*p = 0;
+
+			strncpy(album, buf+6, size-1);
+			album[size-1] = 0;
+		}
+		if (!strcmp(buf, "OK"))
+			break;
+
+		if (!strncmp(buf, "ACK", 3))
+			break;
+	}
+	if (*album)					/* found */
+		return 0;
+
+/* try album intop of playlist */
 	if (inet_write(sock, "playlist\n") == -1) {
 		fprintf(stderr, "error in connection with MPD\n");
 		return -1;
