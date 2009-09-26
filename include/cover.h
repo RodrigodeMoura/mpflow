@@ -30,6 +30,11 @@ typedef struct {
 
 extern Cover covers[NUM_COVERS];
 
+extern int center_cover_x;
+extern int center_cover_y;
+extern int center_cover_w;
+extern int center_cover_h;
+
 void init_covers(void);
 void move_covers_left(void);
 void move_covers_right(void);

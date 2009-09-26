@@ -121,6 +121,7 @@ SDL_SysWMinfo info;
 void mouse_event(SDK_Event event, int buttons, int x, int y) {
 	switch(event) {
 		case SDK_PRESS:
+printf("TD mouse press (%d, %d)\n", x, y);
 			if (y <= screen_height / 8) {			/* top of window activates window drag */
 				window_drag = 1;
 				get_abs_mouse(&drag_x, &drag_y);

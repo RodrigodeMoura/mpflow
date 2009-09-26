@@ -15,6 +15,12 @@
 
 Cover covers[NUM_COVERS];
 
+/*
+	window coordinates and dimension of the center cover in pixels
+	This is _not_ used by OpenGL, but is needed for the mouse
+*/
+int center_cover_x, center_cover_y, center_cover_w, center_cover_h;
+
 
 static void load_cover_texture(Cover *c) {
 	find_album_art(c->dirlist);
@@ -25,6 +31,47 @@ static void load_cover_texture(Cover *c) {
 		snprintf(filename, sizeof(filename), "%s/%s/%s", config_musicdir, c->dirlist->path, c->dirlist->img);
 		load_texture(c->texture_idx, filename);
 	}
+}
+
+/*
+	get the position & dimension of the center cover in screen coordinates
+	This is needed for correct mouse handling
+*/
+static void get_cover_coords(void) {
+GLdouble model_matrix[16], project_matrix[16], obj_x, obj_y, obj_z, win_x, win_y, win_z;
+GLint viewport[4];
+
+	center_cover_x = center_cover_y = center_cover_w = center_cover_h = 0;
+
+	glLoadIdentity();
+	glTranslatef(-ARENA_WIDTH * 0.5f, -ARENA_HEIGHT * 0.5f, -180);
+
+	glGetDoublev(GL_MODELVIEW_MATRIX, model_matrix);
+	glGetDoublev(GL_PROJECTION_MATRIX, project_matrix);
+	glGetIntegerv(GL_VIEWPORT, viewport);
+
+	obj_x = (ARENA_WIDTH - COVER_W) * 0.5f;
+	obj_y = (ARENA_HEIGHT - COVER_H) * 0.5f;
+	obj_z = 0.0f;
+
+	win_x = win_y = win_z = 0.0f;
+
+	if (gluProject(obj_x, obj_y, obj_z, model_matrix, project_matrix, viewport, &win_x, &win_y, &win_z) == GL_FALSE)
+		fprintf(stderr, "error: gluProject() failed, unable to determine window coordinates for correct mouse handling\n");
+	else {
+		center_cover_x = (int)win_x;
+		center_cover_y = (int)win_y;
+	}
+	obj_x += COVER_W;
+	obj_y += COVER_H;
+
+	if (gluProject(obj_x, obj_y, obj_z, model_matrix, project_matrix, viewport, &win_x, &win_y, &win_z) == GL_FALSE)
+		fprintf(stderr, "error: gluProject() failed, unable to determine window coordinates for correct mouse handling\n");
+	else {
+		center_cover_w = (int)win_x - center_cover_x;
+		center_cover_h = (int)win_y - center_cover_y;
+	}
+printf("TD center_cover [%d, %d, %d, %d]\n", center_cover_x, center_cover_y, center_cover_w, center_cover_h);
 }
 
 void init_covers(void) {
@@ -104,6 +151,7 @@ DirList *d;
 		covers[i].texture_idx = i;
 		load_cover_texture(&covers[i]);
 	}
+	get_cover_coords();
 }
 
 static void shift_covers_left(void) {
