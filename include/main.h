@@ -19,6 +19,7 @@ extern int screen_height;
 extern int window_x;
 extern int window_y;
 
+void exit_program(int);
 void move_app_window(int, int);
 void draw(void);
 

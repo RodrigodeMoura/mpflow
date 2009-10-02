@@ -8,6 +8,7 @@
 #include "event.h"
 #include "mpdconf.h"
 #include "texture.h"
+#include "font.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -149,6 +150,9 @@ DirList *d;
 	for(i = 0; i < NUM_COVERS; i++) {
 		covers[i].texture_idx = i;
 		load_cover_texture(&covers[i]);
+
+		covers[i].text_tex_idx = TEX_TEXT + i;
+		render_text(covers[i].text_tex_idx, covers[i].dirlist->name);
 	}
 	get_cover_coords();
 }

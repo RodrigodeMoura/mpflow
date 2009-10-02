@@ -10,6 +10,8 @@
 #include "cover.h"
 #include "event.h"
 #include "mpd.h"
+#include "font.h"
+#include "texture.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,6 +27,12 @@ int display_xres, display_yres;			/* current display resolution */
 
 void draw(void);
 
+
+void exit_program(int code) {
+	deinit_font();
+	deinit_textures();
+	SDK_exit(code);
+}
 
 void init_gl(void) {
 	glMatrixMode(GL_PROJECTION);
@@ -97,7 +105,7 @@ int xres, yres;
 
 	if (SDK_create_window(screen_width, screen_height, 0, "mpflow") < 0) {
 		fprintf(stderr, "error: failed to create window\n");
-		SDK_exit(1);
+		exit_program(1);
 	}
 /*
 	put window in center of the screen
@@ -231,6 +239,7 @@ int main(int argc, char *argv[]) {
 	set_app_icon();
 
 	init_gl();
+	init_font();
 	init_covers();
 	init_events();
 
@@ -245,6 +254,7 @@ int main(int argc, char *argv[]) {
 		else
 			SDK_sleep(FRAME_DELAY);
 	}
+	exit_program(0);
 	return 0;
 }
 

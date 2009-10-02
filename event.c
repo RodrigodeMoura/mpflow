@@ -27,7 +27,7 @@ static int scroll_wheel = 0;
 void handle_keypress(int key) {
 	switch(key) {
 		case SDK_ESC:
-			SDK_exit(0);
+			exit_program(0);
 			break;
 
 		default:
@@ -231,7 +231,7 @@ void mouse_event(SDK_Event event, int buttons, int x, int y) {
 void window_event(SDK_Event event, int w, int h) {
 	switch(event) {
 		case SDK_CLOSE:
-			SDK_exit(0);
+			exit_program(0);
 			break;
 
 		case SDK_EXPOSE:

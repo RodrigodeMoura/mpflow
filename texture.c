@@ -3,6 +3,7 @@
 */
 
 #include "texture.h"
+#include "SDK.h"
 #include "SDL_image.h"
 
 #include <stdio.h>
@@ -10,16 +11,30 @@
 
 
 static GLuint textures[NUM_TEXTURES];
+static int inited = 0;
 
 
 void init_textures(void) {
+	if (inited)
+		return;
+
 	glGenTextures(NUM_TEXTURES, textures);
+	inited = 1;
 
 	load_texture(TEX_DEFAULT_FOLDER, DEFAULT_FOLDER_IMG);
 }
 
-static int load_texture_img(SDL_Surface *img, GLuint tex_id) {
+void deinit_textures(void) {
+	if (inited) {
+		glDeleteTextures(NUM_TEXTURES, textures);
+		inited = 0;
+	}
+}
+
+int surface_to_texture(SDL_Surface *img, int tex_id) {
 int format;
+
+/* TODO check "power of 2" for img dimensions */
 
 	switch(img->format->BytesPerPixel) {
 		case 1:								/* grayscale jpg? */
@@ -39,8 +54,7 @@ int format;
 			fprintf(stderr, "create_texture(): invalid pixel format\n");
 			return -1;
 	}
-	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, tex_id);
+	bind_texture(tex_id);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 /*
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -61,8 +75,7 @@ SDL_Surface *img;
 		return;
 	}
 /* make GL texture */
-
-	load_texture_img(img, textures[idx]);
+	surface_to_texture(img, idx);
 
 	SDL_FreeSurface(img);
 }
@@ -76,6 +89,7 @@ void delete_texture(int idx) {
 }
 
 void bind_texture(int idx) {
+	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, textures[idx]);
 }
 

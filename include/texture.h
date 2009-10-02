@@ -5,14 +5,19 @@
 #ifndef TEXTURE_H_WJ109
 #define TEXTURE_H_WJ109	1
 
-#include "SDK.h"
+#include "cover.h"
 
 #define DEFAULT_FOLDER_IMG	"mpflow_folder.png"
 
-#define NUM_TEXTURES		14
-#define TEX_DEFAULT_FOLDER	(NUM_TEXTURES-1)
+#define NUM_COVER_TEXTURES	NUM_COVERS
+#define TEX_DEFAULT_FOLDER	NUM_COVERS
+#define NUM_TEXT_TEXTURES	NUM_COVERS
+#define TEX_TEXT			(TEX_DEFAULT_FOLDER+1)
+#define NUM_TEXTURES		(NUM_COVER_TEXTURES+1+NUM_TEXT_TEXTURES)
 
 void init_textures(void);
+void deinit_textures(void);
+int surface_to_texture(SDL_Surface *, int);
 void load_texture(int, char *);
 void create_texture(int);
 void delete_texture(int);
