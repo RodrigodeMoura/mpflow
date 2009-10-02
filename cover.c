@@ -446,30 +446,29 @@ GLfloat tex_reflect[8] = {
 void draw_title(void) {
 int w, h;
 
+	glDisable(GL_DEPTH_TEST);
+
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
+	glLoadIdentity();
 
 #ifdef OPENGLES
-	glOrthof(0, screen_width, 0, screen_height, -1, 10);
+	glOrthof(0, screen_width, screen_height, 0, -1, 10);
 #else
-	glOrtho(0, screen_width, 0, screen_height, -1, 10);
+	glOrtho(0, screen_width, screen_height, 0, -1, 10);
 #endif
 
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glLoadIdentity();
 
-	text_dimensions(covers[CENTER_COVER].dirlist->name, &w, &h);
-
 	glColor4f(1, 1, 1, 1);
-	glPrint(10, 100, "%s", covers[CENTER_COVER].dirlist->name);
+	glPrint((screen_width - strlen(covers[CENTER_COVER].dirlist->name) * FONT_W) / 2, screen_height - FONT_H * 2, "%s", covers[CENTER_COVER].dirlist->name);
 
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
-
-	glDisable(GL_BLEND);
 }
 
 void draw_covers(void) {
