@@ -91,6 +91,7 @@ void delete_texture(int idx) {
 void bind_texture(int idx) {
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, textures[idx]);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 
 /* EOB */

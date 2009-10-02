@@ -152,16 +152,19 @@ DirList *d;
 		load_cover_texture(&covers[i]);
 
 		covers[i].text_tex_idx = TEX_TEXT + i;
-		render_text(covers[i].text_tex_idx, covers[i].dirlist->name);
+		render_text(covers[i].text_tex_idx, covers[i].dirlist->name, &covers[i].text_width, &covers[i].text_height);
 	}
 	get_cover_coords();
 }
 
 static void shift_covers_left(void) {
-int i, tex_id;
+int i, tex_id, text_tex_id;
 
 	tex_id = covers[0].texture_idx;
 	delete_texture(tex_id);
+
+	text_tex_id = covers[0].text_tex_idx;
+	delete_texture(text_tex_id);
 
 	memmove(&covers[0], &covers[1], sizeof(Cover) * (NUM_COVERS-1));
 
@@ -173,13 +176,20 @@ int i, tex_id;
 
 	create_texture(tex_id);
 	load_cover_texture(&covers[NUM_COVERS-1]);
+
+	covers[NUM_COVERS-1].text_tex_idx = text_tex_id;
+	create_texture(text_tex_id);
+	render_text(text_tex_id, covers[NUM_COVERS-1].dirlist->name, &covers[NUM_COVERS-1].text_width, &covers[NUM_COVERS-1].text_height);
 }
 
 static void shift_covers_right(void) {
-int i, tex_id;
+int i, tex_id, text_tex_id;
 
 	tex_id = covers[NUM_COVERS-1].texture_idx;
 	delete_texture(tex_id);
+
+	text_tex_id = covers[NUM_COVERS-1].text_tex_idx;
+	delete_texture(text_tex_id);
 
 	memmove(&covers[1], &covers[0], sizeof(Cover) * (NUM_COVERS-1));
 
@@ -191,6 +201,10 @@ int i, tex_id;
 
 	create_texture(tex_id);
 	load_cover_texture(&covers[0]);
+
+	covers[0].text_tex_idx = text_tex_id;
+	create_texture(text_tex_id);
+	render_text(text_tex_id, covers[0].dirlist->name, &covers[0].text_width, &covers[0].text_height);
 }
 
 void move_cover_left(Cover *c) {
@@ -402,9 +416,6 @@ GLfloat tex_reflect[8] = {
 
 	glColor4f(c->color, c->color, c->color, 1);
 
-	glEnable(GL_TEXTURE_2D);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-
 	if (c->dirlist->img != NULL && c->dirlist->img[0])
 		bind_texture(c->texture_idx);
 	else
@@ -446,6 +457,59 @@ GLfloat tex_reflect[8] = {
 	glPopMatrix();
 }
 
+/*
+	draw album title text
+	in orthogonal mode
+*/
+void draw_title(void) {
+GLfloat vertex_arr[8];
+GLfloat tex_arr[8] = {
+	0, 0,
+	0, 1,
+	1, 0,
+	1, 1,
+};
+GLfloat w, h;
+
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+
+	glOrtho(0, screen_width, 0, screen_height, -1, 10);
+
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+	glTranslatef(screen_width * 0.5f, covers[CENTER_COVER].text_height * 3, 0);
+
+	w = covers[CENTER_COVER].text_width * 0.5f;
+	h = covers[CENTER_COVER].text_height * 0.5f;
+
+	vertex_arr[0] = -w;
+	vertex_arr[1] = h;
+	vertex_arr[2] = -w;
+	vertex_arr[3] = -h;
+	vertex_arr[4] = w;
+	vertex_arr[5] = h;
+	vertex_arr[6] = w;
+	vertex_arr[7] = -h;
+
+	bind_texture(covers[CENTER_COVER].text_tex_idx);
+
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND);
+
+	glVertexPointer(2, GL_FLOAT, 0, vertex_arr);
+	glTexCoordPointer(2, GL_FLOAT, 0, tex_arr);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+
+	glDisable(GL_BLEND);
+}
+
 void draw_covers(void) {
 int i;
 
@@ -468,6 +532,8 @@ int i;
 	draw_cover(&covers[CENTER_COVER-1]);
 	draw_cover(&covers[CENTER_COVER]);
 	draw_cover(&covers[CENTER_COVER+1]);
+
+	draw_title();
 }
 
 /* EOB */

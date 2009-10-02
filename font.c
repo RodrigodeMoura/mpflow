@@ -11,6 +11,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <math.h>
 
 
 static TTF_Font *app_font = NULL;
@@ -42,21 +43,49 @@ void deinit_font(void) {
 	TTF_Quit();
 }
 
-void render_text(int tex_id, char *str) {
+int power_of_two(int n) {
+double log2;
+int log2i;
+
+	log2 = log(n) / log(2);
+	log2i = (int)ceil(log2);
+	return (int)(pow(2,log2i));
+}
+
+void render_text(int tex_id, char *str, int *w, int *h) {
 SDL_Color color;
-SDL_Surface *img;
+SDL_Surface *img, *tmp;
+SDL_Rect r;
+int width, height, text_w, text_h;
 
-	delete_texture(tex_id);
-	create_texture(tex_id);
-
-	color.r = color.g = color.b = color.unused = 0xff;
+	color.r = color.g = color.b = 0xff;
+	color.unused = 0xff;
 
 	if ((img = TTF_RenderText_Solid(app_font, str, color)) == NULL) {
 		fprintf(stderr, "error: render_text() failed to render text\n");
 		return;
 	}
-	surface_to_texture(img, tex_id);
+	text_w = img->w;
+	text_h = img->h;
+
+	*w = width = power_of_two(img->w);
+	*h = height = power_of_two(img->h);
+
+	if ((tmp = SDL_CreateRGBSurface(SDL_SWSURFACE, width, height, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000)) == NULL) {
+		SDL_FreeSurface(img);
+		fprintf(stderr, "error: render_text() failed to render text\n");
+		return;
+	}
+	r.x = (width - text_w) / 2;
+	r.y = 0; /* (height - text_h) / 2; */
+
+	SDL_SetColorKey(img, SDL_SRCCOLORKEY, SDL_MapRGB(img->format, 0, 0, 0));
+	SDL_BlitSurface(img, NULL, tmp, &r);
 	SDL_FreeSurface(img);
+
+	surface_to_texture(tmp, tex_id);
+
+	SDL_FreeSurface(tmp);
 }
 
 /* EOB */
