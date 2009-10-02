@@ -119,11 +119,12 @@ int lineno, len;
 		}
 	}
 	fclose(f);
-
+/*
 	printf("TD config_musicdir %s\n", config_musicdir);
 	printf("TD config_address %s\n", config_address);
 	printf("TD config_port %s\n", config_port);
 	printf("TD config_password %s\n", config_password);
+*/
 	return 0;
 }
 
