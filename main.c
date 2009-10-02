@@ -10,7 +10,7 @@
 #include "cover.h"
 #include "event.h"
 #include "mpd.h"
-#include "font.h"
+#include "glPrint.h"
 #include "texture.h"
 
 #include <stdio.h>
@@ -29,7 +29,6 @@ void draw(void);
 
 
 void exit_program(int code) {
-	deinit_font();
 	deinit_textures();
 	SDK_exit(code);
 }
@@ -239,7 +238,7 @@ int main(int argc, char *argv[]) {
 	set_app_icon();
 
 	init_gl();
-	init_font();
+	init_font(FONT_FILE);
 	init_covers();
 	init_events();
 

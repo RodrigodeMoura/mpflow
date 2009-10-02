@@ -1,0 +1,27 @@
+/*
+	glPrint.h	WJ107
+*/
+
+#ifndef GL_PRINT_H_WJ107
+#define GL_PRINT_H_WJ107	1
+
+#define GLPRINT_BUF			512
+
+/*
+	FONT_H is 16, but smaller fonts can also be loaded
+*/
+#define FONT_H				16
+#define FONT_W				8			/* 8 bits, one byte */
+#define LINE_SPACING		2
+
+extern int font_height;
+
+void glPrint(float, float, char *, ...);
+void glPrintw(float, float, float, char *, ...);
+int init_font(char *);
+int reinit_font(char *);
+void text_dimensions(char *, int *, int *);
+
+#endif	/* GL_PRINT_H_WJ107 */
+
+/* EOB */

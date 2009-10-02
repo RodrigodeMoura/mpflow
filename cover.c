@@ -8,7 +8,7 @@
 #include "event.h"
 #include "mpdconf.h"
 #include "texture.h"
-#include "font.h"
+#include "glPrint.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -150,21 +150,15 @@ DirList *d;
 	for(i = 0; i < NUM_COVERS; i++) {
 		covers[i].texture_idx = i;
 		load_cover_texture(&covers[i]);
-
-		covers[i].text_tex_idx = TEX_TEXT + i;
-		render_text(covers[i].text_tex_idx, covers[i].dirlist->name, &covers[i].text_width, &covers[i].text_height);
 	}
 	get_cover_coords();
 }
 
 static void shift_covers_left(void) {
-int i, tex_id, text_tex_id;
+int i, tex_id;
 
 	tex_id = covers[0].texture_idx;
 	delete_texture(tex_id);
-
-	text_tex_id = covers[0].text_tex_idx;
-	delete_texture(text_tex_id);
 
 	memmove(&covers[0], &covers[1], sizeof(Cover) * (NUM_COVERS-1));
 
@@ -176,20 +170,13 @@ int i, tex_id, text_tex_id;
 
 	create_texture(tex_id);
 	load_cover_texture(&covers[NUM_COVERS-1]);
-
-	covers[NUM_COVERS-1].text_tex_idx = text_tex_id;
-	create_texture(text_tex_id);
-	render_text(text_tex_id, covers[NUM_COVERS-1].dirlist->name, &covers[NUM_COVERS-1].text_width, &covers[NUM_COVERS-1].text_height);
 }
 
 static void shift_covers_right(void) {
-int i, tex_id, text_tex_id;
+int i, tex_id;
 
 	tex_id = covers[NUM_COVERS-1].texture_idx;
 	delete_texture(tex_id);
-
-	text_tex_id = covers[NUM_COVERS-1].text_tex_idx;
-	delete_texture(text_tex_id);
 
 	memmove(&covers[1], &covers[0], sizeof(Cover) * (NUM_COVERS-1));
 
@@ -201,10 +188,6 @@ int i, tex_id, text_tex_id;
 
 	create_texture(tex_id);
 	load_cover_texture(&covers[0]);
-
-	covers[0].text_tex_idx = text_tex_id;
-	create_texture(text_tex_id);
-	render_text(text_tex_id, covers[0].dirlist->name, &covers[0].text_width, &covers[0].text_height);
 }
 
 void move_cover_left(Cover *c) {
@@ -458,49 +441,28 @@ GLfloat tex_reflect[8] = {
 }
 
 /*
-	draw album title text
-	in orthogonal mode
+	draw album title text in orthogonal mode
 */
 void draw_title(void) {
-GLfloat vertex_arr[8];
-GLfloat tex_arr[8] = {
-	0, 0,
-	0, 1,
-	1, 0,
-	1, 1,
-};
-GLfloat w, h;
+int w, h;
 
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
 
+#ifdef OPENGLES
+	glOrthof(0, screen_width, 0, screen_height, -1, 10);
+#else
 	glOrtho(0, screen_width, 0, screen_height, -1, 10);
+#endif
 
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glLoadIdentity();
-	glTranslatef(screen_width * 0.5f, covers[CENTER_COVER].text_height * 3, 0);
 
-	w = covers[CENTER_COVER].text_width * 0.5f;
-	h = covers[CENTER_COVER].text_height * 0.5f;
+	text_dimensions(covers[CENTER_COVER].dirlist->name, &w, &h);
 
-	vertex_arr[0] = -w;
-	vertex_arr[1] = h;
-	vertex_arr[2] = -w;
-	vertex_arr[3] = -h;
-	vertex_arr[4] = w;
-	vertex_arr[5] = h;
-	vertex_arr[6] = w;
-	vertex_arr[7] = -h;
-
-	bind_texture(covers[CENTER_COVER].text_tex_idx);
-
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable(GL_BLEND);
-
-	glVertexPointer(2, GL_FLOAT, 0, vertex_arr);
-	glTexCoordPointer(2, GL_FLOAT, 0, tex_arr);
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	glColor4f(1, 1, 1, 1);
+	glPrint(10, 100, "%s", covers[CENTER_COVER].dirlist->name);
 
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();

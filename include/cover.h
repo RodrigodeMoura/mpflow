@@ -25,7 +25,7 @@
 
 typedef struct {
 	float x, y, z, angle, color;
-	int pos, texture_idx, text_tex_idx, text_width, text_height;
+	int pos, texture_idx;
 	DirList *dirlist;
 } Cover;
 
