@@ -268,13 +268,21 @@ int i;
 		return;
 
 	if (!strcmp(argv[1], "-?") || !strcmp(argv[1], "-h") || !strcmp(argv[1], "--help")) {
-		printf("mpflow is a front-end to mpd (Music Player Daemon) that displays the album art\n"
-			"that is present in your music directory. It searches for these files:\n"
-		);
+		printf("\n"
+			"mpflow is a front-end to mpd (Music Player Daemon) that displays the album art\n"
+			"that is present in your music directory. It searches for these files:\n");
+
 		i = 0;
 		while(album_art[i] != NULL)
 			printf("  %s\n", album_art[i++]);
 
+		printf("\n"
+			"usage:\n"
+			"- Use mouse or cursor keys to flip through your albums\n");
+		printf("- Double click the center album to play it\n"
+			"- Click once to pause playback\n");
+		printf("- Right click to skip to the next song\n"
+			"- Shake the window to shuffle playback\n");
 		printf("\n"
 			"Note that mpflow needs mpd and can not be used standalone.\n");
 		exit(1);

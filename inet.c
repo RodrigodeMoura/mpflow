@@ -29,6 +29,7 @@ struct addrinfo hints, *result, *rp;
 	the result set is a list of address
 	if a connect fails, try to connect to the next one (IPv6 may or may not be enabled ...)
 */
+	sock = -1;
 	for(rp = result; rp != NULL; rp = rp->ai_next) {
 		if ((sock = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol)) == -1)
 			continue;
