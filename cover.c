@@ -25,6 +25,9 @@ SDL_Rect center_cover;
 
 
 static void load_cover_texture(Cover *c) {
+	if (c->dirlist == NULL)
+		return;
+
 	find_album_art(c->dirlist);
 
 	if (c->dirlist->img != NULL && c->dirlist->img[0]) {
@@ -400,7 +403,7 @@ GLfloat tex_reflect[8] = {
 
 	glColor4f(c->color, c->color, c->color, 1);
 
-	if (c->dirlist->img != NULL && c->dirlist->img[0])
+	if (c->dirlist != NULL && c->dirlist->img != NULL && c->dirlist->img[0])
 		bind_texture(c->texture_idx);
 	else
 		bind_texture(TEX_DEFAULT_FOLDER);
@@ -444,7 +447,7 @@ GLfloat tex_reflect[8] = {
 /*
 	draw album title text in orthogonal mode
 */
-void draw_title(void) {
+void draw_title(char *str) {
 	glDisable(GL_DEPTH_TEST);
 
 	glMatrixMode(GL_PROJECTION);
@@ -462,7 +465,7 @@ void draw_title(void) {
 	glLoadIdentity();
 
 	glColor4f(1, 1, 1, 1);
-	glPrint((screen_width - strlen(covers[CENTER_COVER].dirlist->name) * FONT_W) / 2, screen_height - FONT_H * 2, "%s", covers[CENTER_COVER].dirlist->name);
+	glPrint((screen_width - strlen(str) * FONT_W) / 2, screen_height - FONT_H * 2, "%s", str);
 
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
@@ -493,7 +496,11 @@ int i;
 	draw_cover(&covers[CENTER_COVER]);
 	draw_cover(&covers[CENTER_COVER+1]);
 
-	draw_title();
+	if (covers[CENTER_COVER].dirlist != NULL)
+		draw_title(covers[CENTER_COVER].dirlist->name);
+}
+
+void startup_cover(void) {
 }
 
 /* EOB */

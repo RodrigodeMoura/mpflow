@@ -11,6 +11,7 @@
 #include "event.h"
 #include "mpd.h"
 #include "glPrint.h"
+#include "font.h"
 #include "texture.h"
 
 #include <stdio.h>
@@ -25,6 +26,8 @@ int window_x, window_y;					/* window position */
 
 int max_xres = 320, max_yres = 200;		/* maximum display resolution (as reported by SDK_max_videomode()) */
 int display_xres, display_yres;			/* current display resolution */
+
+ProgramMode mode = MODE_DEFAULT;
 
 
 void draw(void);
@@ -223,7 +226,35 @@ void draw(void) {
 
 	glTranslatef(-ARENA_WIDTH * 0.5f, -ARENA_HEIGHT * 0.5f, -180);
 
-	draw_covers();
+	if (mode == MODE_TITLE_SCREEN) {
+		Cover c;
+
+		c.x = ARENA_WIDTH * 0.5f;
+		c.y = ARENA_HEIGHT * 0.5f;
+		c.z = 0;
+		c.angle = 0;
+		c.color = 1;
+		c.pos = CENTER_COVER;
+		c.texture_idx = TEX_DEFAULT_FOLDER;
+		c.dirlist = NULL;
+
+		draw_cover(&c);
+		draw_title("mpflow Copyright (C) 2009 Walter de Jong <walter@heiho.net>");
+	} else
+		draw_covers();
+
+	draw_window_border();
+
+	glFlush();
+	SDK_swapbuffers();
+}
+
+void draw_startup(void) {
+	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+	glLoadIdentity();
+
+	glTranslatef(-ARENA_WIDTH * 0.5f, -ARENA_HEIGHT * 0.5f, -180);
+
 	draw_window_border();
 
 	glFlush();
@@ -252,10 +283,16 @@ int i;
 		printf("This is version " VERSION "\n");
 		exit(0);
 	}
+	if (argv[1][0] == '-')
+		printf("unknown command line option '%s'\n", argv[1]);
+	else
+		printf("invalid command line argument '%s'\n", argv[1]);
+
+	exit(1);
 }
 
 int main(int argc, char *argv[]) {
-	printf("mpflow - Copyright 2009 Walter de Jong <walter@heiho.net>\n");
+	printf("mpflow - Copyright (C) 2009 Walter de Jong <walter@heiho.net>\n");
 	get_options(argc, argv);
 
 	init_mpd();
@@ -267,10 +304,12 @@ int main(int argc, char *argv[]) {
 	set_app_icon();
 
 	init_gl();
-	init_font();
-	init_covers();
-	init_events();
+	draw_startup();			/* only a border */
 
+	init_textures();
+	init_covers();
+	init_font();
+	init_events();
 	draw();
 
 	for(;;) {

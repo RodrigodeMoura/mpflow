@@ -15,6 +15,7 @@
 
 void init_textures(void);
 void deinit_textures(void);
+void startup_texture(void);
 int surface_to_texture(SDL_Surface *, int);
 void load_texture(int, char *);
 void create_texture(int);

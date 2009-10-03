@@ -49,22 +49,6 @@ int i, num_bytes, n_line;
 }
 #endif	/* GENERATE_IMG_DATA */
 
-/*
-	make texture from img pixel data
-*/
-void texture_default_folder(void) {
-	bind_texture(TEX_DEFAULT_FOLDER);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-/*
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, s->w, s->h, format, GL_UNSIGNED_BYTE, s->pixels);
-*/
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, DEFAULT_FOLDER_W, DEFAULT_FOLDER_H, 0, GL_RGBA, GL_UNSIGNED_BYTE, default_folder_img);
-
-	glDisable(GL_TEXTURE_2D);
-}
-
 
 void init_textures(void) {
 	if (inited)
@@ -77,7 +61,7 @@ void init_textures(void) {
 	gen_folder_img_data();
 #endif
 /*	load_texture(TEX_DEFAULT_FOLDER, DEFAULT_FOLDER_IMG);	*/
-	texture_default_folder();
+	startup_texture();
 }
 
 void deinit_textures(void) {
@@ -85,6 +69,22 @@ void deinit_textures(void) {
 		glDeleteTextures(NUM_TEXTURES, textures);
 		inited = 0;
 	}
+}
+
+/*
+	make texture from img pixel data
+*/
+void startup_texture(void) {
+	bind_texture(TEX_DEFAULT_FOLDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+/*
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, s->w, s->h, format, GL_UNSIGNED_BYTE, s->pixels);
+*/
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, DEFAULT_FOLDER_W, DEFAULT_FOLDER_H, 0, GL_RGBA, GL_UNSIGNED_BYTE, default_folder_img);
+
+	glDisable(GL_TEXTURE_2D);
 }
 
 /*

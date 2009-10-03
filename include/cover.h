@@ -35,7 +35,10 @@ extern SDL_Rect center_cover;
 void init_covers(void);
 void move_covers_left(void);
 void move_covers_right(void);
+void draw_cover(Cover *);
+void draw_title(char *);
 void draw_covers(void);
+void startup_cover(void);
 
 #endif	/* COVER_H_WJ109 */
 

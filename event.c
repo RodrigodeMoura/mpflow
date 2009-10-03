@@ -25,6 +25,9 @@ static int dir_x, dir_y, dir_x_change, dir_y_change;
 static unsigned int center_clicked = 0;
 static int scroll_wheel = 0;
 
+static SDL_Rect left_corner;
+static SDL_Rect right_corner;
+
 
 void handle_keypress(int key) {
 	switch(key) {
@@ -152,6 +155,9 @@ SDL_SysWMinfo info;
 void mouse_event(SDK_Event event, int buttons, int x, int y) {
 	switch(event) {
 		case SDK_PRESS:
+			if (mode == MODE_TITLE_SCREEN)
+				break;
+
 			if (buttons & SDK_MOUSE_LEFT) {
 				lpress_x = x;
 				lpress_y = y;
@@ -193,6 +199,11 @@ void mouse_event(SDK_Event event, int buttons, int x, int y) {
 			break;
 
 		case SDK_RELEASE:
+			if (mode == MODE_TITLE_SCREEN) {			/* switch back from title screen */
+				mode = MODE_DEFAULT;
+				draw();
+				break;
+			}
 			if (buttons & SDK_MOUSE_LEFT) {
 				window_drag = mouse_drag = 0;
 				key_down = 0;
@@ -212,6 +223,14 @@ void mouse_event(SDK_Event event, int buttons, int x, int y) {
 						play_pause();
 
 					center_clicked = SDK_ticks();
+				} else {
+/* click in top corners to activate title screen */
+					if ((click_rect(&left_corner, x, y) && click_rect(&left_corner, lpress_x, lpress_y))
+						|| (click_rect(&right_corner, x, y) && click_rect(&right_corner, lpress_x, lpress_y))) {
+						mode = MODE_TITLE_SCREEN;
+						draw();
+						break;
+					}
 				}
 			}
 /* right click: skip; play next song */
@@ -222,6 +241,9 @@ void mouse_event(SDK_Event event, int buttons, int x, int y) {
 			break;
 
 		case SDK_MOUSEMOVE:
+			if (mode == MODE_TITLE_SCREEN)
+				break;
+
 			if (window_drag) {
 				int new_x, new_y;
 
@@ -298,6 +320,11 @@ void init_events(void) {
 	ticks_moving = 0;
 
 	mouse_drag = window_drag = 0;
+
+	left_corner.x = left_corner.y = right_corner.y = 0;
+	left_corner.w = right_corner.w = screen_width / 10;
+	left_corner.h = right_corner.h = screen_height / 10;
+	right_corner.x = screen_width - right_corner.w;
 
 	SDK_key_event(key_event);
 	SDK_mouse_event(mouse_event);
