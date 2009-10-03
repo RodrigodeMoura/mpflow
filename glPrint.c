@@ -331,11 +331,11 @@ int i, j, f;
 }
 #endif	/* GENERATE_FONT */
 
-int init_font(char *font_file) {
+int init_font(void) {
 int i;
 
 #ifdef GENERATE_FONT
-	if (load_font(font_file)) {
+	if (load_font("sanserif.fnt")) {
 		fprintf(stderr, "error: failed to load font '%s'\n", font_file);
 		return -1;
 	}
@@ -362,13 +362,6 @@ int i;
 int reinit_font(char *font_file) {
 int i;
 
-#ifdef GENERATE_FONT
-	if (load_font(font_file)) {
-		fprintf(stderr, "error: failed to load font '%s'\n", font_file);
-		return -1;
-	}
-	adjust_fontdata();
-#endif
 	if (font_list)
 		glDeleteLists(font_list, 256);
 

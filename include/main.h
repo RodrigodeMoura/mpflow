@@ -6,7 +6,6 @@
 #define MAIN_H_WJ109	1
 
 #define APP_ICON		"mpflow.png"
-#define FONT_FILE		"sanserif.fnt"
 
 #define ARENA_WIDTH		400
 #define ARENA_HEIGHT	160

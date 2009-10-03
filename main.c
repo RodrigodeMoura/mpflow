@@ -238,7 +238,7 @@ int main(int argc, char *argv[]) {
 	set_app_icon();
 
 	init_gl();
-	init_font(FONT_FILE);
+	init_font();
 	init_covers();
 	init_events();
 

@@ -18,7 +18,7 @@ extern int font_height;
 
 void glPrint(float, float, char *, ...);
 void glPrintw(float, float, float, char *, ...);
-int init_font(char *);
+int init_font(void);
 int reinit_font(char *);
 void text_dimensions(char *, int *, int *);
 
