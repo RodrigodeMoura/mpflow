@@ -201,8 +201,16 @@ void create_texture(int idx) {
 	glGenTextures(1, &textures[idx]);
 }
 
+void create_textures(int range) {
+	glGenTextures(range, textures);
+}
+
 void delete_texture(int idx) {
 	glDeleteTextures(1, &textures[idx]);
+}
+
+void delete_textures(int range) {
+	glDeleteTextures(range, textures);
 }
 
 void bind_texture(int idx) {

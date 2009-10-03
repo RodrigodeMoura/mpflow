@@ -20,6 +20,8 @@ int surface_to_texture(SDL_Surface *, int);
 void load_texture(int, char *);
 void create_texture(int);
 void delete_texture(int);
+void create_textures(int);
+void delete_textures(int);
 void bind_texture(int);
 
 #endif	/* TEXTURE_H_WJ109 */

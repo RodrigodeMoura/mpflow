@@ -27,6 +27,7 @@ void find_album_art(DirList *);
 void init_current_DirList(void);
 DirList *find_dirlist(char *);
 DirList *get_dirlist(void);
+void set_root_dirlist(DirList *);
 
 #endif	/* DIRLIST_H_WJ109 */
 

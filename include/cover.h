@@ -33,12 +33,14 @@ extern Cover covers[NUM_COVERS];
 extern SDL_Rect center_cover;
 
 void init_covers(void);
+void set_cover_dirlist(void);
+void load_cover_textures(void);
 void move_covers_left(void);
 void move_covers_right(void);
 void draw_cover(Cover *);
 void draw_title(char *);
 void draw_covers(void);
-void startup_cover(void);
+int jump_cover(int);
 
 #endif	/* COVER_H_WJ109 */
 

@@ -10,6 +10,8 @@
 #include "SDL_syswm.h"
 #include "cover.h"
 #include "mpd.h"
+#include "dirlist.h"
+#include "texture.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,14 +31,42 @@ static SDL_Rect left_corner;
 static SDL_Rect right_corner;
 
 
+void jump_to_cover(int key) {
+	if (jump_cover(key) == -1)
+		return;
+
+	set_cover_dirlist();
+	delete_textures(NUM_COVER_TEXTURES);
+	create_textures(NUM_COVER_TEXTURES);
+	load_cover_textures();
+
+	draw();
+}
+
 void handle_keypress(int key) {
 	switch(key) {
 		case SDK_ESC:
 			exit_program(0);
 			break;
 
+		case SDK_ENTER:
+			play_album(covers[CENTER_COVER].dirlist->path);
+			break;
+
+		case SDK_SPACE:
+			play_pause();
+			break;
+
+		case SDK_BACKSPACE:
+			play_next();
+			break;
+
+		case SDK_TAB:
+			play_random();
+			break;
+
 		default:
-			;
+			jump_to_cover(key);
 	}
 }
 

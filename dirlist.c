@@ -167,4 +167,8 @@ DirList *get_dirlist(void) {
 	return root_dirlist;
 }
 
+void set_root_dirlist(DirList *p) {
+	root_dirlist = p;
+}
+
 /* EOB */

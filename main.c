@@ -278,11 +278,13 @@ int i;
 
 		printf("\n"
 			"usage:\n"
-			"- Use mouse or cursor keys to flip through your albums\n");
-		printf("- Double click the center album to play it\n"
-			"- Click once to pause playback\n");
-		printf("- Right click to skip to the next song\n"
-			"- Shake the window to shuffle playback\n");
+			"- use mouse or cursor keys to flip through your albums\n");
+		printf("- double click the center album to play it\n"
+			"- click once to pause playback\n");
+		printf("- right click to skip to the next song\n"
+			"- shake the window to shuffle playback\n");
+		printf("- press first letter of an album to skip through the list\n");
+		printf("- hit escape to exit mpflow\n");
 		printf("\n"
 			"Note that mpflow needs mpd and can not be used standalone.\n");
 		exit(1);

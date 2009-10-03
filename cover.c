@@ -81,7 +81,6 @@ GLint viewport[4];
 void init_covers(void) {
 int i;
 float xpos, ypos, color;
-DirList *d;
 
 /* left side */
 	xpos = ARENA_WIDTH * 0.5f - CENTER_SPACE - 5 * COVER_DISTANCE;
@@ -138,6 +137,19 @@ DirList *d;
 	covers[CENTER_COVER].pos = CENTER_COVER;
 
 /* set dirlist pointer */
+	set_cover_dirlist();
+
+/* make textures */
+	init_textures();
+	load_cover_textures();
+
+	get_cover_coords();
+}
+
+void set_cover_dirlist(void) {
+DirList *d;
+int i;
+
 	d = get_dirlist();
 	for(i = CENTER_COVER; i >= 0; i--) {
 		covers[i].dirlist = d;
@@ -148,14 +160,15 @@ DirList *d;
 		covers[i].dirlist = d;
 		d = d->next;
 	}
-/* make textures */
-	init_textures();
+}
+
+void load_cover_textures(void) {
+int i;
 
 	for(i = 0; i < NUM_COVERS; i++) {
 		covers[i].texture_idx = i;
 		load_cover_texture(&covers[i]);
 	}
-	get_cover_coords();
 }
 
 static void shift_covers_left(void) {
@@ -500,7 +513,30 @@ int i;
 		draw_title(covers[CENTER_COVER].dirlist->name);
 }
 
-void startup_cover(void) {
+/*
+	jump by first letter
+*/
+int jump_cover(int key) {
+DirList *p;
+int first;
+
+	if (covers[CENTER_COVER].dirlist->next == covers[CENTER_COVER].dirlist)
+		return -1;
+
+	if (key >= 'A' && key <= 'Z')
+		key += ' ';
+
+	for(p = covers[CENTER_COVER].dirlist->next; p != covers[CENTER_COVER].dirlist; p = p->next) {
+		first = p->name[0];
+		if (first >= 'A' && first <= 'Z')
+			first += ' ';
+
+		if (first == key) {
+			set_root_dirlist(p);
+			return 0;
+		}
+	}
+	return -1;
 }
 
 /* EOB */
