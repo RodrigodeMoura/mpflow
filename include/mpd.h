@@ -14,6 +14,7 @@ int mpd_play(int, char *);
 int play_album(char *);
 int mpd_current_album(int, char *, int);
 int play_next(void);
+int play_pause(void);
 
 #endif	/* MPD_H_WJ109 */
 

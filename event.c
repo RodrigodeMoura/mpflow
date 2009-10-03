@@ -196,6 +196,9 @@ void mouse_event(SDK_Event event, int buttons, int x, int y) {
 				if (click_rect(&center_cover, x, y) && click_rect(&center_cover, lpress_x, lpress_y)) {
 					if (SDK_ticks() - center_clicked <= MOUSE_DOUBLECLICK)
 						play_album(covers[CENTER_COVER].dirlist->path);
+					else
+/* single click pauses */
+						play_pause();
 
 					center_clicked = SDK_ticks();
 				}

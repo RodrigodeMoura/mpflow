@@ -215,16 +215,24 @@ char buf[1280], *rest, *p;
 	return 0;
 }
 
-int play_next(void) {
+int mpd_single_command(char *cmd) {
 int sock;
 
 	if ((sock = mpd_connect()) == -1)
 		return -1;
 
-	mpd_command(sock, "next\n");
+	mpd_command(sock, cmd);
 
 	mpd_close(sock);
 	return 0;
+}
+
+int play_next(void) {
+	return mpd_single_command("next\n");
+}
+
+int play_pause(void) {
+	return mpd_single_command("pause\n");
 }
 
 /* EOB */
