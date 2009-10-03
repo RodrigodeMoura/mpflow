@@ -19,7 +19,7 @@ int key_down;
 int moving;
 unsigned int ticks_moving;
 
-static int mouse_drag, window_drag, drag_x, drag_y, lpress_x, lpress_y;
+static int mouse_drag, window_drag, drag_x, drag_y, lpress_x, lpress_y, rpress_x, rpress_y;
 static unsigned int center_clicked = 0;
 static int scroll_wheel = 0;
 
@@ -169,6 +169,10 @@ void mouse_event(SDK_Event event, int buttons, int x, int y) {
 					}
 				}
 			}
+			if (buttons & SDK_MOUSE_RIGHT) {
+				rpress_x = x;
+				rpress_y = y;
+			}
 			if (buttons & SDK_MOUSE_WHEELUP) {
 				if (key_down != SDK_RIGHT)
 					scroll_wheel++;
@@ -195,6 +199,11 @@ void mouse_event(SDK_Event event, int buttons, int x, int y) {
 
 					center_clicked = SDK_ticks();
 				}
+			}
+/* right click: skip; play next song */
+			if (buttons & SDK_MOUSE_RIGHT) {
+				if (click_rect(&center_cover, x, y) && click_rect(&center_cover, rpress_x, rpress_y))
+					play_next();
 			}
 			break;
 
