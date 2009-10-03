@@ -20,8 +20,8 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+#include "font.h"
 
-static unsigned char font[256 * FONT_H];	/* bitmap font */
 static GLuint font_list = 0;				/* font display lists */
 
 int font_height = FONT_H;
@@ -244,7 +244,7 @@ char buf[GLPRINT_BUF];
 	glPopAttrib();
 }
 
-
+#ifdef GENERATE_FONT
 /*
 	load bitmap font file
 	The format is 1 byte per scanline per character
@@ -303,16 +303,46 @@ unsigned char kar[FONT_H];
 	}
 }
 
+/*
+	used during development to dump the font to C-source
+*/
+static void dump_font(void) {
+int i, j, f;
+
+	printf("int font_height = %d;\n\n", font_height);
+	printf("static unsigned char font[256 * FONT_H] = {		/* bitmap font */\n");
+
+	f = 0;
+	for(j = 0; j < 256; j++) {
+		if (j >= ' ' && j < '~')
+			printf("/* '%c' */\n\t", j);
+		else
+			printf("/* char %d */\n\t", j);
+
+		for(i = 0; i < 8; i++)
+			printf("0x%02x, ", font[f++]);
+		printf("\n\t");
+
+		for(i = 8; i < FONT_H; i++)
+			printf("0x%02x, ", font[f++]);
+		printf("\n");
+	}
+	printf("};\n\n\n");
+}
+#endif	/* GENERATE_FONT */
+
 int init_font(char *font_file) {
 int i;
 
-	if (!font_list) {
-		if (load_font(font_file)) {
-			fprintf(stderr, "error: failed to load font '%s'\n", font_file);
-			return -1;
-		}
-		adjust_fontdata();
-	} else
+#ifdef GENERATE_FONT
+	if (load_font(font_file)) {
+		fprintf(stderr, "error: failed to load font '%s'\n", font_file);
+		return -1;
+	}
+	adjust_fontdata();
+	dump_font();
+#endif
+	if (font_list)
 		glDeleteLists(font_list, 256);
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -332,13 +362,14 @@ int i;
 int reinit_font(char *font_file) {
 int i;
 
-	if (!font_list) {
-		if (load_font(font_file)) {
-			fprintf(stderr, "error: failed to load font '%s'\n", font_file);
-			return -1;
-		}
-		adjust_fontdata();
-	} else
+#ifdef GENERATE_FONT
+	if (load_font(font_file)) {
+		fprintf(stderr, "error: failed to load font '%s'\n", font_file);
+		return -1;
+	}
+	adjust_fontdata();
+#endif
+	if (font_list)
 		glDeleteLists(font_list, 256);
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
