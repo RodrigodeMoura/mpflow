@@ -5,6 +5,7 @@
 #include "texture.h"
 #include "SDK.h"
 #include "SDL_image.h"
+#include "SDL_rotozoom.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,12 +32,65 @@ void deinit_textures(void) {
 	}
 }
 
+/*
+	quick test to see if x is a power of two
+	thanks to wikipedia
+*/
+int is_power_of_two(int x) {
+	if (x <= 0)
+		return 0;
+
+	if ((x & (x - 1)) == 0)
+		return 1;
+
+	return 0;
+}
+
+/*
+	get next power of two, without any round(log2) crap
+	thanks to wikipedia
+*/
+int next_power_of_two(int x) {
+int i;
+
+	x--;
+	for(i = 1; i < sizeof(int) * 8; i <<= 1)
+		x = x | (x >> i);
+	x++;
+	return x;
+}
+
+/*
+	turn an SDL_Surface into an OpenGL texture
+	the trouble with this is, that OpenGL likes powers of two
+	(actually, my NVIDIA card likes all kinds of dimensions, but other brands of video chips don't)
+	so use rotozoom to scale to a power of two -- rotozoom works very well, I say
+*/
 int surface_to_texture(SDL_Surface *img, int tex_id) {
+SDL_Surface *s;
 int format;
 
-/* TODO check "power of 2" for img dimensions */
+	if (img->w <= 0 || img->h <= 0)
+		return -1;
 
-	switch(img->format->BytesPerPixel) {
+	if (!(is_power_of_two(img->w) && is_power_of_two(img->h))) {
+		int w, h;
+		double zoom_x, zoom_y;
+
+		w = next_power_of_two(img->w);
+		h = next_power_of_two(img->h);
+
+		zoom_x = (double)w / (double)img->w;
+		zoom_y = (double)h / (double)img->h;
+
+		if ((s = zoomSurface(img, zoom_x, zoom_y, SMOOTHING_ON)) == NULL) {
+			fprintf(stderr, "error: zoomSurface() failed\n");
+			return -1;
+		}
+	} else
+		s = img;
+
+	switch(s->format->BytesPerPixel) {
 		case 1:								/* grayscale jpg? */
 			format = GL_COLOR_INDEX;		/* so, this is probaby wrong ... */
 			break;
@@ -52,18 +106,26 @@ int format;
 		default:
 			format = -1;		/* invalid */
 			fprintf(stderr, "create_texture(): invalid pixel format\n");
+
+			if (s != img)
+				SDL_FreeSurface(s);
+
 			return -1;
 	}
 	bind_texture(tex_id);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 /*
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, img->w, img->h, format, GL_UNSIGNED_BYTE, img->pixels);
+	gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, s->w, s->h, format, GL_UNSIGNED_BYTE, s->pixels);
 */
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img->w, img->h, 0, format, GL_UNSIGNED_BYTE, img->pixels);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, s->w, s->h, 0, format, GL_UNSIGNED_BYTE, s->pixels);
 
 	glDisable(GL_TEXTURE_2D);
+
+	if (s != img)
+		SDL_FreeSurface(s);
+
 	return 0;
 }
 

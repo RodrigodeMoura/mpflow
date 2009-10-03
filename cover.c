@@ -444,8 +444,6 @@ GLfloat tex_reflect[8] = {
 	draw album title text in orthogonal mode
 */
 void draw_title(void) {
-int w, h;
-
 	glDisable(GL_DEPTH_TEST);
 
 	glMatrixMode(GL_PROJECTION);

@@ -20,7 +20,7 @@
 #define CENTER_SPACE	(COVER_W * 0.75f)
 
 #define FLIP_SPEED		(FPS * 0.2f)
-#define FLIP_SPEED_FAST	(FPS * 0.07f)
+#define FLIP_SPEED_FAST	(FPS * 0.06f)
 #define SPEEDUP_DELAY	1600
 
 typedef struct {
