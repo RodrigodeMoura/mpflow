@@ -130,10 +130,17 @@ char buf[256], *rest;
 	return 0;
 }
 
+/*
+	clear playlist and play album
+	it resets random mode to non-random, so user will have to shuffle again if he prefers random mode
+*/
 int mpd_play(int sock, char *entry) {
 char buf[1280];
 
 	if (mpd_command(sock, "clear\n") == -1)
+		return -1;
+
+	if (mpd_command(sock, "random 0\n") == -1)
 		return -1;
 
 	snprintf(buf, sizeof(buf), "add \"%s\"\n", entry);
@@ -221,8 +228,10 @@ int sock;
 	if ((sock = mpd_connect()) == -1)
 		return -1;
 
-	mpd_command(sock, cmd);
-
+	if (mpd_command(sock, cmd) == -1) {
+		inet_close(sock);
+		return -1;
+	}
 	mpd_close(sock);
 	return 0;
 }
@@ -233,6 +242,24 @@ int play_next(void) {
 
 int play_pause(void) {
 	return mpd_single_command("pause\n");
+}
+
+int play_random(void) {
+int sock;
+
+	if ((sock = mpd_connect()) == -1)
+		return -1;
+
+	if (mpd_command(sock, "random 1\n") == -1) {
+		inet_close(sock);
+		return -1;
+	}
+	if (mpd_command(sock, "next\n") == -1) {
+		inet_close(sock);
+		return -1;
+	}
+	mpd_close(sock);
+	return 0;
 }
 
 /* EOB */

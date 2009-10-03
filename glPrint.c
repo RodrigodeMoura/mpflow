@@ -2,6 +2,10 @@
 	glPrint.c	WJ107
 
 	print bitmapped font to GL screen
+
+	NB. This uses display lists to plot glBitmaps
+	    If you'd want to port this code to OpenGLES, it'd be best to
+	    plot the text to a pixel buffer, and turn it into a texture
 */
 
 #include "SDK.h"

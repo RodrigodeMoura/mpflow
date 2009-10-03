@@ -19,7 +19,9 @@ int key_down;
 int moving;
 unsigned int ticks_moving;
 
-static int mouse_drag, window_drag, drag_x, drag_y, lpress_x, lpress_y, rpress_x, rpress_y;
+static int mouse_drag, window_drag, drag_x, drag_y, orig_x, orig_y;
+static int lpress_x, lpress_y, rpress_x, rpress_y;
+static int dir_x, dir_y, dir_x_change, dir_y_change;
 static unsigned int center_clicked = 0;
 static int scroll_wheel = 0;
 
@@ -157,6 +159,9 @@ void mouse_event(SDK_Event event, int buttons, int x, int y) {
 				if (y <= screen_height / 8) {			/* top of window activates window drag */
 					window_drag = 1;
 					get_abs_mouse(&drag_x, &drag_y);
+					orig_x = drag_x;
+					orig_y = drag_y;
+					dir_x = dir_y = dir_x_change = dir_y_change = 0;
 				} else {
 					if (x < screen_width / 3) {
 						key_down = SDK_RIGHT;
@@ -192,6 +197,12 @@ void mouse_event(SDK_Event event, int buttons, int x, int y) {
 				window_drag = mouse_drag = 0;
 				key_down = 0;
 
+/* shake window for random play */
+				if (dir_x_change + dir_y_change >= WINDOW_SHAKE)
+					play_random();
+
+				dir_x = dir_y = dir_x_change = dir_y_change = 0;
+
 /* double click on center cover plays the album */
 				if (click_rect(&center_cover, x, y) && click_rect(&center_cover, lpress_x, lpress_y)) {
 					if (SDK_ticks() - center_clicked <= MOUSE_DOUBLECLICK)
@@ -215,6 +226,32 @@ void mouse_event(SDK_Event event, int buttons, int x, int y) {
 				int new_x, new_y;
 
 				get_abs_mouse(&new_x, &new_y);
+
+/* keep stats about directional changes for detecting 'window shake' */
+				if (new_x - orig_x < 0) {
+					if (dir_x >= 0)
+						dir_x_change++;
+					dir_x = -1;
+				} else {
+					if (new_x - orig_x > 0) {
+						if (dir_x <= 0)
+							dir_x_change++;
+						dir_x = 1;
+					}
+				}
+				if (new_y - orig_y < 0) {
+					if (dir_y >= 0)
+						dir_y_change++;
+					dir_y = -1;
+				} else {
+					if (new_y - orig_y > 0) {
+						if (dir_y <= 0)
+							dir_y_change++;
+						dir_y = 1;
+					}
+				}
+
+/* drag window to new position */
 				move_app_window(window_x + (new_x - drag_x), window_y + (new_y - drag_y));
 				drag_x = new_x;
 				drag_y = new_y;

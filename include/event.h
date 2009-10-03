@@ -9,6 +9,7 @@
 #define MOVE_RIGHT		2
 
 #define MOUSE_DOUBLECLICK	500			/* time in milliseconds */
+#define WINDOW_SHAKE		5
 
 extern int key_down;
 extern int moving;
