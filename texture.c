@@ -6,13 +6,64 @@
 #include "SDK.h"
 #include "SDL_image.h"
 #include "SDL_rotozoom.h"
+#include "default_folder.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 
-
 static GLuint textures[NUM_TEXTURES];
 static int inited = 0;
+
+
+#ifdef GENERATE_IMG_DATA
+/*
+	during development only:
+	generate data for the default folder image pixel buffer
+*/
+void gen_folder_img_data(void) {
+SDL_Surface *img;
+int i, num_bytes, n_line;
+
+	if ((img = IMG_Load(DEFAULT_FOLDER_IMG)) == NULL) {
+		fprintf(stderr, "error: failed to load '%s'\n", DEFAULT_FOLDER_IMG);
+		return;
+	}
+	printf("#define DEFAULT_FOLDER_W\t%d\n", img->w);
+	printf("#define DEFAULT_FOLDER_H\t%d\n\n", img->h);
+	printf("static unsigned char default_folder_img[] = {\n\t");
+	num_bytes = img->w * img->h * 4;
+
+	n_line = 0;
+	for(i = 0; i < num_bytes; i++) {
+		printf("0x%02x, ", ((unsigned char *)(img->pixels))[i]);
+
+		n_line++;
+		if (n_line >= 8) {
+			n_line = 0;
+			printf("\n\t");
+		}
+	}
+	printf("\n};\n");
+
+	SDL_FreeSurface(img);
+}
+#endif	/* GENERATE_IMG_DATA */
+
+/*
+	make texture from img pixel data
+*/
+void texture_default_folder(void) {
+	bind_texture(TEX_DEFAULT_FOLDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+/*
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, s->w, s->h, format, GL_UNSIGNED_BYTE, s->pixels);
+*/
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, DEFAULT_FOLDER_W, DEFAULT_FOLDER_H, 0, GL_RGBA, GL_UNSIGNED_BYTE, default_folder_img);
+
+	glDisable(GL_TEXTURE_2D);
+}
 
 
 void init_textures(void) {
@@ -22,7 +73,11 @@ void init_textures(void) {
 	glGenTextures(NUM_TEXTURES, textures);
 	inited = 1;
 
-	load_texture(TEX_DEFAULT_FOLDER, DEFAULT_FOLDER_IMG);
+#ifdef GENERATE_IMG_DATA
+	gen_folder_img_data();
+#endif
+/*	load_texture(TEX_DEFAULT_FOLDER, DEFAULT_FOLDER_IMG);	*/
+	texture_default_folder();
 }
 
 void deinit_textures(void) {

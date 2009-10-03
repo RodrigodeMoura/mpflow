@@ -13,6 +13,8 @@ struct DirList_tag {
 	const char *img;
 };
 
+extern const char *album_art[];
+
 DirList *new_DirList(void);
 void destroy_DirList(DirList *);
 

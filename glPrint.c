@@ -10,6 +10,7 @@
 
 #include "SDK.h"
 #include "glPrint.h"
+#include "font.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,8 +20,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-
-#include "font.h"
 
 static GLuint font_list = 0;				/* font display lists */
 

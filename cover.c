@@ -9,6 +9,7 @@
 #include "mpdconf.h"
 #include "texture.h"
 #include "glPrint.h"
+#include "font.h"
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -11,7 +11,7 @@
 #define ARENA_HEIGHT	160
 #define Z_FAR			160
 
-#define FPS				30
+#define FPS				50
 #define FRAME_DELAY		(1000 / FPS)
 
 extern int screen_width;

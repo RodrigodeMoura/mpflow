@@ -17,6 +17,7 @@ const char *album_art[] = {
 	"cover.jpg",
 	"Folder.jpg",
 	"AlbumArtSmall.jpg",
+	NULL
 };
 
 const char *no_album_art = "";
@@ -100,20 +101,20 @@ DirList *d;
 void find_album_art(DirList *d) {
 char filename[1024];
 struct stat statbuf;
-int i, num;
+int i;
 
 	if (d->img != NULL)
 		return;
 
-	num = sizeof(album_art) / sizeof(char *);
-
-	for(i = 0; i < num; i++) {
+	i = 0;
+	while(album_art[i] != NULL) {
 		snprintf(filename, sizeof(filename), "%s/%s/%s", config_musicdir, d->path, album_art[i]);
 
 		if (!stat(filename, &statbuf) && S_ISREG(statbuf.st_mode)) {
 			d->img = album_art[i];
 			return;
 		}
+		i++;
 	}
 	d->img = no_album_art;
 }

@@ -16,6 +16,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define VERSION		"0.9"
+
 
 int screen_width = 600;					/* current display resolution (or window size) */
 int screen_height = 200;
@@ -228,7 +230,34 @@ void draw(void) {
 	SDK_swapbuffers();
 }
 
+void get_options(int argc, char *argv[]) {
+int i;
+
+	if (argc <= 1)
+		return;
+
+	if (!strcmp(argv[1], "-?") || !strcmp(argv[1], "-h") || !strcmp(argv[1], "--help")) {
+		printf("mpflow is a front-end to mpd (Music Player Daemon) that displays the album art\n"
+			"that is present in your music directory. It searches for these files:\n"
+		);
+		i = 0;
+		while(album_art[i] != NULL)
+			printf("  %s\n", album_art[i++]);
+
+		printf("\n"
+			"Note that mpflow needs mpd and can not be used standalone.\n");
+		exit(1);
+	}
+	if (!strcmp(argv[1], "-v") || !strcmp(argv[1], "--version")) {
+		printf("This is version " VERSION "\n");
+		exit(0);
+	}
+}
+
 int main(int argc, char *argv[]) {
+	printf("mpflow - Copyright 2009 Walter de Jong <walter@heiho.net>\n");
+	get_options(argc, argv);
+
 	init_mpd();
 
 /* init app */
