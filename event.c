@@ -85,7 +85,6 @@ void key_event(SDK_Event state, int key) {
 }
 
 void move(void) {
-/* TODO increase flipping speed to a certain maximum */
 	if (!moving) {
 		switch(key_down) {
 			case SDK_LEFT:
