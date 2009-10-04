@@ -279,6 +279,12 @@ int i;
 		printf("- hit escape to exit mpflow\n");
 		printf("\n"
 			"Note that mpflow needs mpd and can not be used standalone.\n");
+
+		printf("\n\n");
+		printf("mpflow COMES WITH NO WARRANTY. mpflow IS FREE SOFTWARE.\n"
+			"mpflow is distributed under terms described in the GNU General Public\n"
+			"License.\n");
+
 		exit(1);
 	}
 	if (!strcmp(argv[1], "-v") || !strcmp(argv[1], "--version")) {

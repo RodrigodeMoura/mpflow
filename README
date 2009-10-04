@@ -1,0 +1,45 @@
+mpflow Copyright (C) 2009 Walter de Jong <walter@heiho.net>
+
+
+mpflow COMES WITH NO WARRANTY. mpflow IS FREE SOFTWARE.
+mpflow is distributed under terms described in the GNU General Public
+License.
+
+
+mpflow is a front-end to mpd (Music Player Daemon) that has an interface
+that was greatly inspired by CoverFlow(tm).
+
+It displays the album art that you have in your music directories.
+mpflow looks for these files in each directory:
+  - cover.jpg
+  - Folder.jpg
+  - AlbumArtSmall.jpg
+
+mpflow expects your music directory to be arranged in one directory
+per album, with a cover.jpg in it.
+
+mpflow is a simple player that has a basic set of features:
+- browse         (cursor keys  or click on the sides)
+- play directory (double-click or press Enter)
+- pause playback (single click or press Space)
+- shuffle        (shake window or press Tab)
+- skip song      (right click  or press backspace)
+
+
+At this point, mpflow is primarily intended as a cover browser rather
+than a full-fledged mp3 player. For things like changing the volume,
+use gnome-volume-control or whatever. If you want playlists, use a
+different front-end. I use Sonata.
+
+
+For optimal joy, cover.jpg files should be 256x256 or 512x512 in size.
+A resolution like 300x300 works well too, as long as it's square.
+Smaller sizes like 128x128 do work, but get blurry.
+
+
+Greets,
+
+     --Walter
+
+
+EOB
