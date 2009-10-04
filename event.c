@@ -2,8 +2,6 @@
 	event.c	WJ109
 */
 
-/* TODO mouse drag window maken */
-
 #include "event.h"
 #include "SDK.h"
 #include "main.h"
