@@ -7,6 +7,7 @@
 #include "SDL_image.h"
 #include "SDL_rotozoom.h"
 #include "default_folder.h"
+#include "power_of_two.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -85,34 +86,6 @@ void startup_texture(void) {
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, DEFAULT_FOLDER_W, DEFAULT_FOLDER_H, 0, GL_RGBA, GL_UNSIGNED_BYTE, default_folder_img);
 
 	glDisable(GL_TEXTURE_2D);
-}
-
-/*
-	quick test to see if x is a power of two
-	thanks to wikipedia
-*/
-int is_power_of_two(int x) {
-	if (x <= 0)
-		return 0;
-
-	if ((x & (x - 1)) == 0)
-		return 1;
-
-	return 0;
-}
-
-/*
-	get next power of two, without any round(log2) crap
-	thanks to wikipedia
-*/
-int next_power_of_two(int x) {
-int i;
-
-	x--;
-	for(i = 1; i < sizeof(int) * 8; i <<= 1)
-		x = x | (x >> i);
-	x++;
-	return x;
 }
 
 /*

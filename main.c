@@ -12,6 +12,7 @@
 #include "mpd.h"
 #include "glPrint.h"
 #include "font.h"
+#include "text.h"
 #include "texture.h"
 
 #include <stdio.h>
@@ -239,7 +240,8 @@ void draw(void) {
 		c.dirlist = NULL;
 
 		draw_cover(&c);
-		draw_title("mpflow Copyright (C) 2009 Walter de Jong <walter@heiho.net>");
+		draw_text();
+/*		draw_title("mpflow Copyright (C) 2009 Walter de Jong <walter@heiho.net>");	*/
 	} else
 		draw_covers();
 
@@ -319,6 +321,7 @@ int main(int argc, char *argv[]) {
 	init_textures();
 	init_covers();
 	init_font();
+	init_text();
 	init_events();
 	draw();
 

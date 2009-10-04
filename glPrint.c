@@ -23,8 +23,6 @@
 
 static GLuint font_list = 0;				/* font display lists */
 
-int font_height = FONT_H;
-
 
 static void glPrint_string(float x, float y, char *buf) {
 char *str, *p;
