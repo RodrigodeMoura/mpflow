@@ -12,6 +12,8 @@
 #include "mpd.h"
 #include "dirlist.h"
 #include "texture.h"
+#include "text.h"
+#include "font.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -44,6 +46,11 @@ void jump_to_cover(int key) {
 }
 
 void handle_keypress(int key) {
+	if (mode == MODE_TITLE_SCREEN) {
+		if (key == SDK_ESC)
+			exit_program(0);
+		return;
+	}
 	switch(key) {
 		case SDK_ESC:
 			exit_program(0);
@@ -54,6 +61,7 @@ void handle_keypress(int key) {
 			break;
 
 		case SDK_SPACE:
+
 			play_pause();
 			break;
 
@@ -231,6 +239,8 @@ void mouse_event(SDK_Event event, int buttons, int x, int y) {
 		case SDK_RELEASE:
 			if (mode == MODE_TITLE_SCREEN) {			/* switch back from title screen */
 				mode = MODE_DEFAULT;
+				clear_text();
+				reset_cover_title_text();
 				draw();
 				break;
 			}
@@ -258,6 +268,8 @@ void mouse_event(SDK_Event event, int buttons, int x, int y) {
 					if ((click_rect(&left_corner, x, y) && click_rect(&left_corner, lpress_x, lpress_y))
 						|| (click_rect(&right_corner, x, y) && click_rect(&right_corner, lpress_x, lpress_y))) {
 						mode = MODE_TITLE_SCREEN;
+						clear_text();
+						center_text(-1, screen_height - FONT_H * 2, "mpflow Copyright (C) 2009 Walter de Jong <walter@heiho.net>", YELLOW);
 						draw();
 						break;
 					}

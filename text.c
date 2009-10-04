@@ -11,13 +11,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <assert.h>
 
-static unsigned char *text_tile;		/* pixel buffer that is used for bliiting text */
+static unsigned char *text_tile;		/* pixel buffer that is used for blitting text */
 
 static Color4 text_colors[8] = {
 	{ 0, 0, 0, 0xff },					/* black */
@@ -31,6 +26,7 @@ static Color4 text_colors[8] = {
 };
 
 static TextBox *textboxes = NULL;
+static TextBox static_textbox;			/* single statically allocated textbox (speed optimization) */
 
 
 void init_text(void) {
@@ -38,6 +34,7 @@ void init_text(void) {
 	text_tile = (unsigned char *)malloc(TEXT_TILE_W * TEXT_TILE_H * TEXT_TILE_BPP);
 }
 
+#ifdef DYNAMIC_TEXTBOXES
 TextBox *new_TextBox(void) {
 TextBox *t;
 
@@ -70,9 +67,33 @@ void destroy_TextBox(TextBox *t) {
 				t->next->prev = t->prev;
 		}
 	}
+	if (t->str != NULL)
+		free(t->str);
+
 	glDeleteTextures(1, &t->tex_id);			/* hmmm ... what if it was never generated in the first place? */
 	free(t);
 }
+#else	/* no DYNAMIC_TEXTBOXES */
+/*
+	mpflow needs only 1 textbox active at a time ... so we can optimize greatly
+	Ugly? Yes, but it works ;)
+*/
+TextBox *new_TextBox(void) {
+	memset(&static_textbox, 0, sizeof(TextBox));
+	textboxes = &static_textbox;
+	return &static_textbox;
+}
+
+void destroy_TextBox(TextBox *t) {
+	if (t->str != NULL)
+		free(t->str);
+
+	glDeleteTextures(1, &t->tex_id);
+
+	textboxes = NULL;
+}
+
+#endif	/* DYNAMIC_TEXTBOXES */
 
 /*
 	scan the complete character from left to right to see what its width is
@@ -149,7 +170,7 @@ int w = 0;
 
 	x,y is subposition in text_tile
 	max_width is the length of the sentence in pixels
-	max_width is used so that textures have a minimum size; they are not ARENA_WIDTH wide
+	max_width is used so that textures have a minimum size; they are not screen_width wide
 
 	returns the width of the blitted character
 */
@@ -205,11 +226,16 @@ static void blit_text(int x, int y, char *str, Color4 *color, int max_width, int
 				return;
 
 			default:
+#ifdef TEXTBOX_COLORCODES
+/*
+	support for changing color within a string using color codes
+*/
 				if ((unsigned char)*str >= CHAR_BLACK
 					&& (unsigned char)*str <= CHAR_WHITE) {				/* change color */
 					if (color->a == 0xff && color != &text_colors[BLACK])
 						color = &text_colors[(unsigned char)*str - CHAR_BLACK];
 				} else
+#endif
 					x += blit_char(x, y, *str, color, max_width, flags) + FONT_LINING+FONT_SPACING;
 		}
 		if (x >= max_width)		/* wrap past end of buffer */
@@ -333,7 +359,7 @@ TextBox *render_text(float x, float y, char *str, TextColor color) {
 */
 TextBox *center_text(float x, float y, char *str, TextColor color) {
 	if (x < 0)
-		x = (ARENA_WIDTH - text_width_bitfont(str, 0)) * 0.5f;
+		x = (screen_width - text_width_bitfont(str, 0)) * 0.5f;
 
 	return do_render_text(x, y, str, color, 0);
 }
@@ -350,15 +376,13 @@ TextBox *render_text_monospace(float x, float y, char *str, TextColor color) {
 */
 TextBox *center_text_monospace(float x, float y, char *str, TextColor color) {
 	if (x < 0)
-		x = (ARENA_WIDTH - text_width_bitfont(str, TEXT_MONOSPACE)) * 0.5f;
+		x = (screen_width - text_width_bitfont(str, TEXT_MONOSPACE)) * 0.5f;
 
 	return render_text_monospace(x, y, str, color);
 }
 
 /*
-	basically, draw a textured rectangle
-	However, a textbox can also have a sprite code in the text,
-	in which case a sprite needs to be drawn
+	basically, draw a textured rectangle in orthogonal mode
 */
 void draw_textbox(TextBox *box) {
 GLfloat vertex_arr[8] = {
@@ -368,29 +392,54 @@ GLfloat vertex_arr[8] = {
 	1.0f, 1.0f
 };
 GLfloat tex_arr[8] = {
-	0.0f, 0.0f,
-	0.0f, 1.0f,
-	1.0f, 0.0f,
-	1.0f, 1.0f
+	0, 0,
+	0, 1,
+	1, 0,
+	1, 1,
 };
 
 	if (box->str == NULL)
 		return;
 
+	vertex_arr[3] = vertex_arr[7] = box->h;
+	vertex_arr[4] = vertex_arr[6] = box->w;
+
+	glDisable(GL_DEPTH_TEST);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_COLOR, GL_ONE_MINUS_SRC_ALPHA);
+
+	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
+	glLoadIdentity();
+
+#ifdef OPENGLES
+	glOrthof(0, screen_width, screen_height, 0, -1, 10);
+#else
+	glOrtho(0, screen_width, screen_height, 0, -1, 10);
+#endif
+
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
 
 	glTranslatef(box->x, box->y, 0.0f);
 
+	glColor4f(1, 1, 1, 1);
+	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, box->tex_id);
-
-	vertex_arr[3] = vertex_arr[7] = box->h;
-	vertex_arr[4] = vertex_arr[6] = box->w;
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
 	glVertexPointer(2, GL_FLOAT, 0, vertex_arr);
 	glTexCoordPointer(2, GL_FLOAT, 0, tex_arr);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
+	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+
+	glDisable(GL_BLEND);
 }
 
 void draw_text(void) {

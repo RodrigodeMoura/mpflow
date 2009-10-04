@@ -19,6 +19,8 @@
 #define COVER_DISTANCE	(COVER_W * 0.125f)
 #define CENTER_SPACE	(COVER_W * 0.75f)
 
+#define REFLECT_FACTOR	0.28f
+
 #define FLIP_SPEED		(FPS * 0.2f)
 #define FLIP_SPEED_FAST	(FPS * 0.06f)
 #define SPEEDUP_DELAY	1600
@@ -35,6 +37,7 @@ extern SDL_Rect center_cover;
 void init_covers(void);
 void set_cover_dirlist(void);
 void load_cover_textures(void);
+void reset_cover_title_text(void);
 void move_covers_left(void);
 void move_covers_right(void);
 void draw_cover(Cover *);

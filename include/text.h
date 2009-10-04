@@ -18,8 +18,8 @@
 */
 #define NUM_TEXT_IDS	16
 
-#define TEXT_TILE_W		1024		/* next_power_of_two(ARENA_WIDTH) */
-#define TEXT_TILE_H		16			/* next_power_of_two(FONT_H+FONT_LINING) */
+#define TEXT_TILE_W		1024		/* next_power_of_two(screen_width), but hey ... */
+#define TEXT_TILE_H		32			/* next_power_of_two(FONT_H + FONT_LINING) */
 #define TEXT_TILE_BPP	4
 
 /* text string color codes */

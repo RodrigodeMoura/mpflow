@@ -10,7 +10,6 @@
 #include "cover.h"
 #include "event.h"
 #include "mpd.h"
-#include "glPrint.h"
 #include "font.h"
 #include "text.h"
 #include "texture.h"
@@ -318,11 +317,12 @@ int main(int argc, char *argv[]) {
 	init_gl();
 	draw_startup();			/* only a border */
 
+/* note that the order of init_() functions here is important (!) */
 	init_textures();
-	init_covers();
-	init_font();
 	init_text();
+	init_covers();
 	init_events();
+
 	draw();
 
 	for(;;) {

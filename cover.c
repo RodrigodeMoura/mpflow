@@ -8,7 +8,7 @@
 #include "event.h"
 #include "mpdconf.h"
 #include "texture.h"
-#include "glPrint.h"
+#include "text.h"
 #include "font.h"
 
 #include <stdio.h>
@@ -144,6 +144,8 @@ float xpos, ypos, color;
 	load_cover_textures();
 
 	get_cover_coords();
+
+	reset_cover_title_text();
 }
 
 void set_cover_dirlist(void) {
@@ -171,6 +173,15 @@ int i;
 	}
 }
 
+/*
+	update title text
+*/
+void reset_cover_title_text(void) {
+	clear_text();
+	if (covers[CENTER_COVER].dirlist != NULL)
+		center_text(-1, screen_height - FONT_H * 2, covers[CENTER_COVER].dirlist->name, WHITE);
+}
+
 static void shift_covers_left(void) {
 int i, tex_id;
 
@@ -187,6 +198,8 @@ int i, tex_id;
 
 	create_texture(tex_id);
 	load_cover_texture(&covers[NUM_COVERS-1]);
+
+	reset_cover_title_text();
 }
 
 static void shift_covers_right(void) {
@@ -205,6 +218,8 @@ int i, tex_id;
 
 	create_texture(tex_id);
 	load_cover_texture(&covers[0]);
+
+	reset_cover_title_text();
 }
 
 void move_cover_left(Cover *c) {
@@ -432,7 +447,7 @@ GLfloat tex_reflect[8] = {
 	do not use alpha blending; blend makes the reflections blend thru each other,
 	which we don't want to happen
 */
-	glColor4f(c->color * 0.25f, c->color * 0.25f, c->color * 0.25f, 1);
+	glColor4f(c->color * REFLECT_FACTOR, c->color * REFLECT_FACTOR, c->color * REFLECT_FACTOR, 1);
 
 	glVertexPointer(2, GL_FLOAT, 0, vertex_arr);
 	glTexCoordPointer(2, GL_FLOAT, 0, tex_reflect);
@@ -454,35 +469,6 @@ GLfloat tex_reflect[8] = {
 	glVertexPointer(2, GL_FLOAT, 0, line_arr);
 	glDrawArrays(GL_LINE_LOOP, 0, 4);
 
-	glPopMatrix();
-}
-
-/*
-	draw album title text in orthogonal mode
-*/
-void draw_title(char *str) {
-	glDisable(GL_DEPTH_TEST);
-
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-
-#ifdef OPENGLES
-	glOrthof(0, screen_width, screen_height, 0, -1, 10);
-#else
-	glOrtho(0, screen_width, screen_height, 0, -1, 10);
-#endif
-
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
-
-	glColor4f(1, 1, 1, 1);
-	glPrint((screen_width - strlen(str) * FONT_W) / 2, screen_height - FONT_H * 2, "%s", str);
-
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
-	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
 }
 
@@ -509,8 +495,7 @@ int i;
 	draw_cover(&covers[CENTER_COVER]);
 	draw_cover(&covers[CENTER_COVER+1]);
 
-	if (covers[CENTER_COVER].dirlist != NULL)
-		draw_title(covers[CENTER_COVER].dirlist->name);
+	draw_text();
 }
 
 /*
