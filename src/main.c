@@ -13,6 +13,7 @@
 #include "font.h"
 #include "text.h"
 #include "texture.h"
+#include "app_icon.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -146,36 +147,6 @@ int xres, yres;
 		info.info.x11.unlock_func();
 	} else
 		window_x = window_y = 0;
-}
-
-void set_app_icon(void) {
-SDL_Surface *icon, *img;
-int i, n;
-
-	if ((img = IMG_Load(APP_ICON)) == NULL) {
-		fprintf(stderr, "error: failed to load application icon image\n");
-		return;
-	}
-	if ((icon = SDL_CreateRGBSurfaceFrom(img->pixels, img->w, img->h, 32, img->w * 4, 0xff, 0xff00, 0xff0000, 0xff000000)) == NULL)
-		fprintf(stderr, "error: failed to create app icon surface\n");
-
-printf("unsigned char *app_icon[] = {\n\t");
-n = 0;
-for(i = 0; i < 100 * 100 * 4; i++) {
-	printf("0x%02x, ", ((unsigned char *)(img->pixels))[i]);
-
-	n++;
-	if (n >= 8) {
-		n = 0;
-		printf("\n\t");
-	}
-}
-printf("\n};\n\n");
-
-	SDL_WM_SetIcon(icon, NULL);
-	SDL_FreeSurface(icon);
-
-	SDL_FreeSurface(img);
 }
 
 /*
