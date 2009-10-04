@@ -434,6 +434,16 @@ GLfloat tex_arr[8] = {
 	glTexCoordPointer(2, GL_FLOAT, 0, tex_arr);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
+/*
+	draw fake reflection
+	While this seemed like a nice idea, it looks annoying
+
+	glColor4f(0.4f, 0.4f, 0.4f, 1);
+
+	glVertexPointer(2, GL_FLOAT, 0, vertex_arr);
+	glTexCoordPointer(2, GL_FLOAT, 0, tex_reflect);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+*/
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);
