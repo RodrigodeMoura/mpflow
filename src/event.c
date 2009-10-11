@@ -59,7 +59,6 @@ void handle_keypress(int key) {
 			break;
 
 		case SDK_SPACE:
-
 			play_pause();
 			break;
 
