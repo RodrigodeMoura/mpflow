@@ -40,7 +40,8 @@ Widget *w;
 		if (w->mouse_event != NULL
 		    && x >= w->x && x <= w->x + w->w
 		    && y >= w->y && y <= w->y + w->h)
-		 	w->mouse_event(event, buttons, x, y);
+		 	if (w->mouse_event(event, buttons, x, y))
+				break;
 	}
 }
 

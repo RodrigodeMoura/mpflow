@@ -25,8 +25,6 @@ void init_widget_covers(void) {
 	w_covers.mouse_event = NULL;
 
 	w_covers.next = NULL;
-
-	main_widget = &w_covers;
 }
 
 static int input_covers(int key) {

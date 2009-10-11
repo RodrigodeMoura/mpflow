@@ -13,6 +13,8 @@
 #include "text.h"
 #include "font.h"
 #include "widget.h"
+#include "widget_covers.h"
+#include "widget_about.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -44,20 +46,10 @@ void jump_to_cover(int key) {
 	draw();
 }
 
-void handle_keypress(int key) {
-	if (mode == MODE_TITLE_SCREEN) {
-		if (key == SDK_ESC)
-			exit_program(0);
-		return;
-	} else {
-		input_widgets(key);
-	}
-}
-
 void key_event(SDK_Event state, int key) {
 	if (state == SDK_PRESS) {
 		key_down = key;
-		handle_keypress(key);
+		input_widgets(key);
 	} else
 		key_down = 0;
 }
@@ -214,6 +206,7 @@ void mouse_event(SDK_Event event, int buttons, int x, int y) {
 		case SDK_RELEASE:
 			if (mode == MODE_TITLE_SCREEN) {			/* switch back from title screen */
 				mode = MODE_DEFAULT;
+				main_widget = &w_covers;
 				clear_text();
 				reset_cover_title_text();
 				draw();
@@ -243,6 +236,7 @@ void mouse_event(SDK_Event event, int buttons, int x, int y) {
 					if ((click_rect(&left_corner, x, y) && click_rect(&left_corner, lpress_x, lpress_y))
 						|| (click_rect(&right_corner, x, y) && click_rect(&right_corner, lpress_x, lpress_y))) {
 						mode = MODE_TITLE_SCREEN;
+						main_widget = &w_about;
 						clear_text();
 						center_text(-1, screen_height - FONT_H * 2, "mpflow Copyright (C) 2009 Walter de Jong <walter@heiho.net>", YELLOW);
 						draw();

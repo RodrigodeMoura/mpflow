@@ -12,7 +12,7 @@ struct Widget_tag {
 
 	void (*draw)(void);
 	int (*input_event)(int);
-	void (*mouse_event)(int, int, int, int);
+	int (*mouse_event)(int, int, int, int);
 
 	Widget *next;
 };

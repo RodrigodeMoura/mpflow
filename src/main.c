@@ -15,6 +15,7 @@
 #include "texture.h"
 #include "app_icon.h"
 #include "widget_covers.h"
+#include "widget_about.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -218,25 +219,7 @@ void draw(void) {
 
 	glTranslatef(-ARENA_WIDTH * 0.5f, -ARENA_HEIGHT * 0.5f, -180);
 
-	if (mode == MODE_TITLE_SCREEN) {
-		Cover c;
-
-		c.x = ARENA_WIDTH * 0.5f;
-		c.y = ARENA_HEIGHT * 0.5f;
-		c.z = 0;
-		c.angle = 0;
-		c.color = 1;
-		c.pos = CENTER_COVER;
-		c.texture_idx = TEX_DEFAULT_FOLDER;
-		c.dirlist = NULL;
-
-		draw_cover(&c);
-		draw_text();
-/*		draw_title("mpflow Copyright (C) 2009 Walter de Jong <walter@heiho.net>");	*/
-	} else {
-/*		draw_covers();	*/
-		draw_widgets();
-	}
+	draw_widgets();
 	draw_window_border();
 
 	glFlush();
@@ -323,7 +306,9 @@ int main(int argc, char *argv[]) {
 	init_events();
 
 	init_widget_covers();
+	init_widget_about();
 
+	main_widget = &w_covers;
 	draw();
 
 	for(;;) {
