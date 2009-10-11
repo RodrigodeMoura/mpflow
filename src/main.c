@@ -16,6 +16,7 @@
 #include "app_icon.h"
 #include "widget_covers.h"
 #include "widget_about.h"
+#include "widget_aboutbutton.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -305,8 +306,9 @@ int main(int argc, char *argv[]) {
 
 	init_widget_covers();
 	init_widget_about();
+	init_widget_aboutbutton();
 
-	main_widget = &w_covers;
+	main_widget = &w_about_button1;
 	main_widget->prepare();
 	draw();
 

@@ -3,6 +3,7 @@
 */
 
 #include "widget_about.h"
+#include "widget_aboutbutton.h"
 #include "widget_covers.h"
 #include "main.h"
 #include "cover.h"
@@ -19,7 +20,6 @@ Widget w_about;
 static void prepare_about(void);
 static void draw_about(void);
 static int input_about(int);
-static int mouse_about(int, int, int, int);
 static void click_about(int, int, int);
 
 void init_widget_about(void) {
@@ -77,7 +77,7 @@ static int input_about(int key) {
 
 static void click_about(int button, int x, int y) {
 	if (button == SDK_MOUSE_LEFT || button == SDK_MOUSE_RIGHT) {
-		main_widget = &w_covers;
+		main_widget = &w_about_button1;
 		main_widget->prepare();
 		draw();
 	}
