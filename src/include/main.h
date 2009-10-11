@@ -14,16 +14,10 @@
 #define FPS				50
 #define FRAME_DELAY		(1000 / FPS)
 
-typedef enum {
-	MODE_DEFAULT = 0,
-	MODE_TITLE_SCREEN = 1
-} ProgramMode;
-
 extern int screen_width;
 extern int screen_height;
 extern int window_x;
 extern int window_y;
-extern ProgramMode mode;
 
 void exit_program(int);
 void move_app_window(int, int);

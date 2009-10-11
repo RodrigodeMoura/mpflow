@@ -160,9 +160,6 @@ SDL_SysWMinfo info;
 void mouse_event(SDK_Event event, int buttons, int x, int y) {
 	switch(event) {
 		case SDK_PRESS:
-			if (mode == MODE_TITLE_SCREEN)
-				break;
-
 			if (buttons & SDK_MOUSE_LEFT) {
 				lpress_x = x;
 				lpress_y = y;
@@ -204,14 +201,6 @@ void mouse_event(SDK_Event event, int buttons, int x, int y) {
 			break;
 
 		case SDK_RELEASE:
-			if (mode == MODE_TITLE_SCREEN) {			/* switch back from title screen */
-				mode = MODE_DEFAULT;
-				main_widget = &w_covers;
-				clear_text();
-				reset_cover_title_text();
-				draw();
-				break;
-			}
 			if (buttons & SDK_MOUSE_LEFT) {
 				window_drag = mouse_drag = 0;
 				key_down = 0;
@@ -235,10 +224,8 @@ void mouse_event(SDK_Event event, int buttons, int x, int y) {
 /* click in top corners to activate title screen */
 					if ((click_rect(&left_corner, x, y) && click_rect(&left_corner, lpress_x, lpress_y))
 						|| (click_rect(&right_corner, x, y) && click_rect(&right_corner, lpress_x, lpress_y))) {
-						mode = MODE_TITLE_SCREEN;
 						main_widget = &w_about;
-						clear_text();
-						center_text(-1, screen_height - FONT_H * 2, "mpflow Copyright (C) 2009 Walter de Jong <walter@heiho.net>", YELLOW);
+						main_widget->prepare();
 						draw();
 						break;
 					}
@@ -252,9 +239,6 @@ void mouse_event(SDK_Event event, int buttons, int x, int y) {
 			break;
 
 		case SDK_MOUSEMOVE:
-			if (mode == MODE_TITLE_SCREEN)
-				break;
-
 			if (window_drag) {
 				int new_x, new_y;
 

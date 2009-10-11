@@ -12,6 +12,7 @@
 
 Widget w_covers;
 
+static void prepare_covers(void);
 static int input_covers(int);
 
 
@@ -20,11 +21,17 @@ void init_widget_covers(void) {
 	w_covers.w = screen_width;
 	w_covers.h = screen_height;
 
+	w_covers.prepare = prepare_covers;
 	w_covers.draw = draw_covers;
 	w_covers.input_event = input_covers;
 	w_covers.mouse_event = NULL;
 
 	w_covers.next = NULL;
+}
+
+static void prepare_covers(void) {
+	clear_text();
+	reset_cover_title_text();
 }
 
 static int input_covers(int key) {

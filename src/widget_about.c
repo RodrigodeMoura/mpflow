@@ -6,6 +6,7 @@
 #include "widget_covers.h"
 #include "main.h"
 #include "cover.h"
+#include "font.h"
 #include "text.h"
 #include "texture.h"
 #include "SDK.h"
@@ -15,6 +16,7 @@
 
 Widget w_about;
 
+static void prepare_about(void);
 static void draw_about(void);
 static int input_about(int);
 
@@ -23,11 +25,17 @@ void init_widget_about(void) {
 	w_about.w = screen_width;
 	w_about.h = screen_height;
 
+	w_about.prepare = prepare_about;
 	w_about.draw = draw_about;
 	w_about.input_event = input_about;
 	w_about.mouse_event = NULL;
 
 	w_about.next = NULL;
+}
+
+static void prepare_about(void) {
+	clear_text();
+	center_text(-1, screen_height - FONT_H * 2, "mpflow Copyright (C) 2009 Walter de Jong <walter@heiho.net>", YELLOW);
 }
 
 static void draw_about(void) {
@@ -55,6 +63,8 @@ static int input_about(int key) {
 		case SDK_ENTER:
 		case SDK_SPACE:
 			main_widget = &w_covers;
+			main_widget->prepare();
+			draw();
 			return 1;
 
 		default:

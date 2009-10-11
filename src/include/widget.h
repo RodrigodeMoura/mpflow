@@ -10,6 +10,7 @@ typedef struct Widget_tag Widget;
 struct Widget_tag {
 	int x, y, w, h;
 
+	void (*prepare)(void);
 	void (*draw)(void);
 	int (*input_event)(int);
 	int (*mouse_event)(int, int, int, int);

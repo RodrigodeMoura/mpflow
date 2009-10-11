@@ -145,7 +145,7 @@ float xpos, ypos, color;
 
 	get_cover_coords();
 
-	reset_cover_title_text();
+/*	reset_cover_title_text();	*/
 }
 
 void set_cover_dirlist(void) {

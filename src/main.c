@@ -30,8 +30,6 @@ int window_x, window_y;					/* window position */
 int max_xres = 320, max_yres = 200;		/* maximum display resolution (as reported by SDK_max_videomode()) */
 int display_xres, display_yres;			/* current display resolution */
 
-ProgramMode mode = MODE_DEFAULT;
-
 
 void draw(void);
 
@@ -309,6 +307,7 @@ int main(int argc, char *argv[]) {
 	init_widget_about();
 
 	main_widget = &w_covers;
+	main_widget->prepare();
 	draw();
 
 	for(;;) {
