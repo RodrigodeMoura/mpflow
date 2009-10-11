@@ -230,30 +230,14 @@ void mouse_event(SDK_Event event, int buttons, int x, int y) {
 
 				dir_x = dir_y = dir_x_change = dir_y_change = 0;
 
-/* double click on center cover plays the album */
-				if (click_rect(&center_cover, x, y) && click_rect(&center_cover, lpress_x, lpress_y)) {
-					if (SDK_ticks() - center_clicked <= MOUSE_DOUBLECLICK)
-						play_album(covers[CENTER_COVER].dirlist->path);
-					else
-/* single click pauses */
-						play_pause();
-
-					center_clicked = SDK_ticks();
-				} else {
 /* click in top corners to activate title screen */
-					if ((click_rect(&left_corner, x, y) && click_rect(&left_corner, lpress_x, lpress_y))
-						|| (click_rect(&right_corner, x, y) && click_rect(&right_corner, lpress_x, lpress_y))) {
-						main_widget = &w_about;
-						main_widget->prepare();
-						draw();
-						break;
-					}
+				if ((click_rect(&left_corner, x, y) && click_rect(&left_corner, lpress_x, lpress_y))
+					|| (click_rect(&right_corner, x, y) && click_rect(&right_corner, lpress_x, lpress_y))) {
+					main_widget = &w_about;
+					main_widget->prepare();
+					draw();
+					break;
 				}
-			}
-/* right click: skip; play next song */
-			if (buttons & SDK_MOUSE_RIGHT) {
-				if (click_rect(&center_cover, x, y) && click_rect(&center_cover, rpress_x, rpress_y))
-					play_next();
 			}
 			break;
 
