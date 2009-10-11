@@ -17,6 +17,8 @@ struct Widget_tag {
 	Widget *next;
 };
 
+extern Widget *main_widget;
+
 int init_widgets(void);
 void draw_widgets(void);
 void input_widgets(int);

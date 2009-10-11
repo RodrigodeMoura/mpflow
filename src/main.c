@@ -14,6 +14,7 @@
 #include "text.h"
 #include "texture.h"
 #include "app_icon.h"
+#include "widget_covers.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -232,9 +233,10 @@ void draw(void) {
 		draw_cover(&c);
 		draw_text();
 /*		draw_title("mpflow Copyright (C) 2009 Walter de Jong <walter@heiho.net>");	*/
-	} else
-		draw_covers();
-
+	} else {
+/*		draw_covers();	*/
+		draw_widgets();
+	}
 	draw_window_border();
 
 	glFlush();
@@ -319,6 +321,8 @@ int main(int argc, char *argv[]) {
 	init_text();
 	init_covers();
 	init_events();
+
+	init_widget_covers();
 
 	draw();
 

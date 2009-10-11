@@ -12,6 +12,7 @@
 #include "texture.h"
 #include "text.h"
 #include "font.h"
+#include "widget.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -48,30 +49,8 @@ void handle_keypress(int key) {
 		if (key == SDK_ESC)
 			exit_program(0);
 		return;
-	}
-	switch(key) {
-		case SDK_ESC:
-			exit_program(0);
-			break;
-
-		case SDK_ENTER:
-			play_album(covers[CENTER_COVER].dirlist->path);
-			break;
-
-		case SDK_SPACE:
-			play_pause();
-			break;
-
-		case SDK_BACKSPACE:
-			play_next();
-			break;
-
-		case SDK_TAB:
-			play_random();
-			break;
-
-		default:
-			jump_to_cover(key);
+	} else {
+		input_widgets(key);
 	}
 }
 
