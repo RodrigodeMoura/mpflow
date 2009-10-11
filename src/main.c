@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define VERSION		"0.9"
+#define VERSION		"0.9.1"
 
 
 int screen_width = 600;					/* current display resolution (or window size) */

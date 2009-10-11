@@ -112,7 +112,7 @@ void move(void) {
 /*
 	see if a mouse click was in a particular area
 */
-static int click_rect(SDL_Rect *r, int x, int y) {
+int click_rect(SDL_Rect *r, int x, int y) {
 	if (x < r->x)
 		return 0;
 
@@ -163,7 +163,15 @@ void mouse_event(SDK_Event event, int buttons, int x, int y) {
 			if (buttons & SDK_MOUSE_LEFT) {
 				lpress_x = x;
 				lpress_y = y;
+				break;
+			}
+			if (buttons & SDK_MOUSE_RIGHT) {
+				rpress_x = x;
+				rpress_y = y;
+				break;
+			}
 
+#ifdef OLDCODE
 				if (y <= screen_height / 8) {			/* top of window activates window drag */
 					window_drag = 1;
 					get_abs_mouse(&drag_x, &drag_y);
@@ -182,10 +190,6 @@ void mouse_event(SDK_Event event, int buttons, int x, int y) {
 					}
 				}
 			}
-			if (buttons & SDK_MOUSE_RIGHT) {
-				rpress_x = x;
-				rpress_y = y;
-			}
 			if (buttons & SDK_MOUSE_WHEELUP) {
 				if (key_down != SDK_RIGHT)
 					scroll_wheel++;
@@ -198,9 +202,24 @@ void mouse_event(SDK_Event event, int buttons, int x, int y) {
 
 				key_down = SDK_RIGHT;
 			}
+#endif
 			break;
 
 		case SDK_RELEASE:
+			if (buttons & SDK_MOUSE_LEFT) {
+				if (abs(lpress_x - x) <= 2 && abs(lpress_y - y) <= 2) {
+					click_widgets(SDK_MOUSE_LEFT, x, y);
+					break;
+				}
+			}
+			if (buttons & SDK_MOUSE_RIGHT) {
+				if (abs(rpress_x - x) <= 2 && abs(rpress_y - y) <= 2) {
+					click_widgets(SDK_MOUSE_RIGHT, x, y);
+					break;
+				}
+			}
+
+
 			if (buttons & SDK_MOUSE_LEFT) {
 				window_drag = mouse_drag = 0;
 				key_down = 0;

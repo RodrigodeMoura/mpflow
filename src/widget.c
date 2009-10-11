@@ -33,15 +33,14 @@ Widget *w;
 	}
 }
 
-void mouse_widgets(int event, int buttons, int x, int y) {
+void click_widgets(int button, int x, int y) {
 Widget *w;
 
 	for(w = main_widget; w != NULL; w = w->next) {
-		if (w->mouse_event != NULL
+		if (w->click_event != NULL
 		    && x >= w->x && x <= w->x + w->w
 		    && y >= w->y && y <= w->y + w->h)
-		 	if (w->mouse_event(event, buttons, x, y))
-				break;
+		 	w->click_event(button, x, y);
 	}
 }
 

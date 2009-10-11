@@ -6,15 +6,18 @@
 #include "cover.h"
 #include "mpd.h"
 #include "SDK.h"
+#include "event.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 
 Widget w_covers;
 
+static unsigned int center_clicked = 0;
+
 static void prepare_covers(void);
 static int input_covers(int);
-
+static void click_covers(int, int, int);
 
 void init_widget_covers(void) {
 	w_covers.x = w_covers.y = 0;
@@ -24,7 +27,7 @@ void init_widget_covers(void) {
 	w_covers.prepare = prepare_covers;
 	w_covers.draw = draw_covers;
 	w_covers.input_event = input_covers;
-	w_covers.mouse_event = NULL;
+	w_covers.click_event = click_covers;
 
 	w_covers.next = NULL;
 }
@@ -61,6 +64,27 @@ static int input_covers(int key) {
 			return 1;
 	}
 	return 0;		/* unrecognized key, pass it on */
+}
+
+static void click_covers(int button, int x, int y) {
+	if (button & SDK_MOUSE_LEFT) {
+/* double click on center cover plays the album */
+		if (click_rect(&center_cover, x, y)) {
+			if (SDK_ticks() - center_clicked <= MOUSE_DOUBLECLICK)
+				play_album(covers[CENTER_COVER].dirlist->path);
+			else
+/* single click pauses */
+				play_pause();
+
+			center_clicked = SDK_ticks();
+		}
+	}
+
+/* right click: skip; play next song */
+	if (button & SDK_MOUSE_RIGHT) {
+		if (click_rect(&center_cover, x, y))
+			play_next();
+	}
 }
 
 /* EOB */

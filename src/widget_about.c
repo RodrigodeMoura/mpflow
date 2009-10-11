@@ -19,6 +19,8 @@ Widget w_about;
 static void prepare_about(void);
 static void draw_about(void);
 static int input_about(int);
+static int mouse_about(int, int, int, int);
+static void click_about(int, int, int);
 
 void init_widget_about(void) {
 	w_about.x = w_about.y = 0;
@@ -28,7 +30,7 @@ void init_widget_about(void) {
 	w_about.prepare = prepare_about;
 	w_about.draw = draw_about;
 	w_about.input_event = input_about;
-	w_about.mouse_event = NULL;
+	w_about.click_event = click_about;
 
 	w_about.next = NULL;
 }
@@ -71,6 +73,14 @@ static int input_about(int key) {
 			;
 	}
 	return 0;
+}
+
+static void click_about(int button, int x, int y) {
+	if (button == SDK_MOUSE_LEFT || button == SDK_MOUSE_RIGHT) {
+		main_widget = &w_covers;
+		main_widget->prepare();
+		draw();
+	}
 }
 
 /* EOB */
