@@ -22,13 +22,13 @@
 
 int key_down;
 int moving;
+int scroll_wheel = 0;
 unsigned int ticks_moving;
 
 static int mouse_drag, window_drag, drag_x, drag_y, orig_x, orig_y;
 static int lpress_x, lpress_y, rpress_x, rpress_y;
 static int dir_x, dir_y, dir_x_change, dir_y_change;
 static unsigned int center_clicked = 0;
-static int scroll_wheel = 0;
 
 static SDL_Rect left_corner;
 static SDL_Rect right_corner;
@@ -163,14 +163,31 @@ void mouse_event(SDK_Event event, int buttons, int x, int y) {
 			if (buttons & SDK_MOUSE_LEFT) {
 				lpress_x = x;
 				lpress_y = y;
-				break;
 			}
 			if (buttons & SDK_MOUSE_RIGHT) {
 				rpress_x = x;
 				rpress_y = y;
-				break;
+			}
+/*
+			if (buttons & (SDK_MOUSE_WHEELUP|SDK_MOUSE_WHEELDOWN)) {
+				mouse_widgets(event, buttons, x, y);
 			}
 
+
+scroll wheel handler code
+			 if (button & SDK_MOUSE_WHEELUP) {
+				if (key_down != SDK_RIGHT)
+					scroll_wheel++;
+
+				key_down = SDK_LEFT;
+			}
+			if (button & SDK_MOUSE_WHEELDOWN) {
+				if (key_down != SDK_LEFT)
+					scroll_wheel++;
+
+				key_down = SDK_RIGHT;
+			}
+*/
 #ifdef OLDCODE
 				if (y <= screen_height / 8) {			/* top of window activates window drag */
 					window_drag = 1;
@@ -178,34 +195,15 @@ void mouse_event(SDK_Event event, int buttons, int x, int y) {
 					orig_x = drag_x;
 					orig_y = drag_y;
 					dir_x = dir_y = dir_x_change = dir_y_change = 0;
-				} else {
-					if (x < screen_width / 3) {
-						key_down = SDK_RIGHT;
-						mouse_drag = 1;
-					} else {
-						if (x > screen_width - screen_width / 3) {
-							key_down = SDK_LEFT;
-							mouse_drag = 1;
-						}
-					}
 				}
-			}
-			if (buttons & SDK_MOUSE_WHEELUP) {
-				if (key_down != SDK_RIGHT)
-					scroll_wheel++;
-
-				key_down = SDK_LEFT;
-			}
-			if (buttons & SDK_MOUSE_WHEELDOWN) {
-				if (key_down != SDK_LEFT)
-					scroll_wheel++;
-
-				key_down = SDK_RIGHT;
 			}
 #endif
 			break;
 
 		case SDK_RELEASE:
+			window_drag = mouse_drag = 0;
+			key_down = 0;
+
 			if (buttons & SDK_MOUSE_LEFT) {
 				if (abs(lpress_x - x) <= 2 && abs(lpress_y - y) <= 2) {
 					click_widgets(SDK_MOUSE_LEFT, x, y);
@@ -229,15 +227,6 @@ void mouse_event(SDK_Event event, int buttons, int x, int y) {
 					play_random();
 
 				dir_x = dir_y = dir_x_change = dir_y_change = 0;
-
-/* click in top corners to activate title screen */
-				if ((click_rect(&left_corner, x, y) && click_rect(&left_corner, lpress_x, lpress_y))
-					|| (click_rect(&right_corner, x, y) && click_rect(&right_corner, lpress_x, lpress_y))) {
-					main_widget = &w_about;
-					main_widget->prepare();
-					draw();
-					break;
-				}
 			}
 			break;
 
@@ -275,20 +264,6 @@ void mouse_event(SDK_Event event, int buttons, int x, int y) {
 				move_app_window(window_x + (new_x - drag_x), window_y + (new_y - drag_y));
 				drag_x = new_x;
 				drag_y = new_y;
-			} else {
-				if (mouse_drag) {
-					int k;
-
-					if (x < screen_width / 2)
-						k = SDK_RIGHT;
-					else
-						k = SDK_LEFT;
-
-					if (k != key_down) {
-						key_down = k;
-						ticks_moving = SDK_ticks();
-					}
-				}
 			}
 			break;
 

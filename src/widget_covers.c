@@ -14,6 +14,7 @@
 Widget w_covers;
 
 static unsigned int center_clicked = 0;
+static SDL_Rect left_side, right_side;
 
 static void prepare_covers(void);
 static int input_covers(int);
@@ -30,6 +31,19 @@ void init_widget_covers(void) {
 	w_covers.click_event = click_covers;
 
 	w_covers.next = NULL;
+/*
+	setup areas for mouse clicks
+	NB. init_covers() must have been called before this function
+*/
+	left_side.x = 0;
+	left_side.y = center_cover.y;
+	left_side.w = center_cover.x;
+	left_side.h = center_cover.h;
+
+	right_side.x = center_cover.x + center_cover.w;
+	right_side.y = center_cover.y;
+	right_side.w = screen_width - right_side.x;
+	right_side.h = center_cover.h;
 }
 
 static void prepare_covers(void) {
@@ -77,6 +91,16 @@ static void click_covers(int button, int x, int y) {
 				play_pause();
 
 			center_clicked = SDK_ticks();
+		} else {
+			if (click_rect(&left_side, x, y)) {
+				moving = MOVE_RIGHT;
+				ticks_moving = SDK_ticks();
+			} else {
+				if (click_rect(&right_side, x, y)) {
+					moving = MOVE_LEFT;
+					ticks_moving = SDK_ticks();
+				}
+			}
 		}
 	}
 

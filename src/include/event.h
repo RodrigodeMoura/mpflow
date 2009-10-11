@@ -15,6 +15,7 @@
 
 extern int key_down;
 extern int moving;
+extern int scroll_wheel;
 extern unsigned int ticks_moving;
 
 void init_events(void);
