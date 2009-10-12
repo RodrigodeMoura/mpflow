@@ -27,11 +27,8 @@ unsigned int ticks_moving;
 
 static int mouse_drag, window_drag, drag_x, drag_y, orig_x, orig_y;
 static int lpress_x, lpress_y, rpress_x, rpress_y;
+static unsigned int lpress_time = 0, rpress_time = 0;
 static int dir_x, dir_y, dir_x_change, dir_y_change;
-static unsigned int center_clicked = 0;
-
-static SDL_Rect left_corner;
-static SDL_Rect right_corner;
 
 
 void jump_to_cover(int key) {
@@ -163,10 +160,12 @@ void mouse_event(SDK_Event event, int buttons, int x, int y) {
 			if (buttons & SDK_MOUSE_LEFT) {
 				lpress_x = x;
 				lpress_y = y;
+				lpress_time = SDK_ticks();
 			}
 			if (buttons & SDK_MOUSE_RIGHT) {
 				rpress_x = x;
 				rpress_y = y;
+				rpress_time = SDK_ticks();
 			}
 /*
 			if (buttons & (SDK_MOUSE_WHEELUP|SDK_MOUSE_WHEELDOWN)) {
@@ -205,13 +204,15 @@ scroll wheel handler code
 			key_down = 0;
 
 			if (buttons & SDK_MOUSE_LEFT) {
-				if (abs(lpress_x - x) <= 2 && abs(lpress_y - y) <= 2) {
+				lpress_time = SDK_ticks() - lpress_time;
+				if (abs(lpress_x - x) <= 2 && abs(lpress_y - y) <= 2 && lpress_time <= MOUSE_CLICK) {
 					click_widgets(SDK_MOUSE_LEFT, x, y);
 					break;
 				}
 			}
 			if (buttons & SDK_MOUSE_RIGHT) {
-				if (abs(rpress_x - x) <= 2 && abs(rpress_y - y) <= 2) {
+				rpress_time = SDK_ticks() - rpress_time;
+				if (abs(rpress_x - x) <= 2 && abs(rpress_y - y) <= 2 && rpress_time <= MOUSE_CLICK) {
 					click_widgets(SDK_MOUSE_RIGHT, x, y);
 					break;
 				}
@@ -293,11 +294,6 @@ void init_events(void) {
 	ticks_moving = 0;
 
 	mouse_drag = window_drag = 0;
-
-	left_corner.x = left_corner.y = right_corner.y = 0;
-	left_corner.w = right_corner.w = screen_width / 10;
-	left_corner.h = right_corner.h = screen_height / 10;
-	right_corner.x = screen_width - right_corner.w;
 
 	SDK_key_event(key_event);
 	SDK_mouse_event(mouse_event);
