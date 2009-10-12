@@ -18,9 +18,12 @@ static SDL_Rect left_side, right_side;
 
 static void prepare_covers(void);
 static int input_covers(int);
+static void mouse_covers(int, int, int, int);
 static void click_covers(int, int, int);
 
 void init_widget_covers(void) {
+	memset(&w_covers, 0, sizeof(Widget));
+
 	w_covers.x = w_covers.y = 0;
 	w_covers.w = screen_width;
 	w_covers.h = screen_height;
@@ -28,6 +31,7 @@ void init_widget_covers(void) {
 	w_covers.prepare = prepare_covers;
 	w_covers.draw = draw_covers;
 	w_covers.input_event = input_covers;
+	w_covers.mouse_event = mouse_covers;
 	w_covers.click_event = click_covers;
 
 	w_covers.next = NULL;
@@ -78,6 +82,28 @@ static int input_covers(int key) {
 			return 1;
 	}
 	return 0;		/* unrecognized key, pass it on */
+}
+
+static void mouse_covers(int event, int buttons, int x, int y) {
+	if (event == SDK_PRESS) {
+/* use mouse wheel to scroll */
+		if (buttons & SDK_MOUSE_WHEELUP) {
+			if (key_down != SDK_RIGHT)
+				scroll_wheel++;
+
+			key_down = SDK_LEFT;
+			moving = MOVE_RIGHT;
+			ticks_moving = SDK_ticks();
+		}
+		if (buttons & SDK_MOUSE_WHEELDOWN) {
+			if (key_down != SDK_LEFT)
+				scroll_wheel++;
+
+			key_down = SDK_RIGHT;
+			moving = MOVE_LEFT;
+			ticks_moving = SDK_ticks();
+		}
+	}
 }
 
 static void click_covers(int button, int x, int y) {

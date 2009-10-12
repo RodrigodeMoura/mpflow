@@ -20,8 +20,8 @@
 #include <stdlib.h>
 
 
-int key_down;
-int moving;
+int key_down = 0;
+int moving = 0;
 int scroll_wheel = 0;
 unsigned int ticks_moving;
 
@@ -167,34 +167,18 @@ void mouse_event(SDK_Event event, int buttons, int x, int y) {
 				rpress_y = y;
 				rpress_time = SDK_ticks();
 			}
-/*
-			if (buttons & (SDK_MOUSE_WHEELUP|SDK_MOUSE_WHEELDOWN)) {
+/* pass on scroll wheel events */
+			if (buttons & (SDK_MOUSE_WHEELUP|SDK_MOUSE_WHEELDOWN))
 				mouse_widgets(event, buttons, x, y);
-			}
 
-
-scroll wheel handler code
-			 if (button & SDK_MOUSE_WHEELUP) {
-				if (key_down != SDK_RIGHT)
-					scroll_wheel++;
-
-				key_down = SDK_LEFT;
-			}
-			if (button & SDK_MOUSE_WHEELDOWN) {
-				if (key_down != SDK_LEFT)
-					scroll_wheel++;
-
-				key_down = SDK_RIGHT;
-			}
-*/
 #ifdef OLDCODE
-				if (y <= screen_height / 8) {			/* top of window activates window drag */
-					window_drag = 1;
-					get_abs_mouse(&drag_x, &drag_y);
-					orig_x = drag_x;
-					orig_y = drag_y;
-					dir_x = dir_y = dir_x_change = dir_y_change = 0;
-				}
+/* window drag at "title border" */
+			if (y <= screen_height / 8) {			/* top of window activates window drag */
+				window_drag = 1;
+				get_abs_mouse(&drag_x, &drag_y);
+				orig_x = drag_x;
+				orig_y = drag_y;
+				dir_x = dir_y = dir_x_change = dir_y_change = 0;
 			}
 #endif
 			break;
@@ -216,18 +200,6 @@ scroll wheel handler code
 					click_widgets(SDK_MOUSE_RIGHT, x, y);
 					break;
 				}
-			}
-
-
-			if (buttons & SDK_MOUSE_LEFT) {
-				window_drag = mouse_drag = 0;
-				key_down = 0;
-
-/* shake window for random play */
-				if (dir_x_change + dir_y_change >= WINDOW_SHAKE)
-					play_random();
-
-				dir_x = dir_y = dir_x_change = dir_y_change = 0;
 			}
 			break;
 

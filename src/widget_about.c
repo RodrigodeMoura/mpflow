@@ -23,6 +23,8 @@ static int input_about(int);
 static void click_about(int, int, int);
 
 void init_widget_about(void) {
+	memset(&w_about, 0, sizeof(Widget));
+
 	w_about.x = w_about.y = 0;
 	w_about.w = screen_width;
 	w_about.h = screen_height;
