@@ -15,6 +15,7 @@ struct Widget_tag {
 	int (*input_event)(int);
 	void (*mouse_event)(int, int, int, int);
 	void (*click_event)(int, int, int);
+	void (*drag_event)(int, int);
 
 	Widget *next;
 };
@@ -26,6 +27,7 @@ void draw_widgets(void);
 void input_widgets(int);
 void mouse_widgets(int, int, int, int);
 void click_widgets(int, int, int);
+void drag_widgets(int, int, int, int);
 
 #endif	/* WIDGET_H_WJ109 */
 

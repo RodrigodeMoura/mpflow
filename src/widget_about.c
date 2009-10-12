@@ -4,6 +4,7 @@
 
 #include "widget_about.h"
 #include "widget_aboutbutton.h"
+#include "widget_titlebar.h"
 #include "widget_covers.h"
 #include "main.h"
 #include "cover.h"
@@ -79,8 +80,8 @@ static int input_about(int key) {
 
 static void click_about(int button, int x, int y) {
 	if (button == SDK_MOUSE_LEFT || button == SDK_MOUSE_RIGHT) {
-		main_widget = &w_about_button1;
-		main_widget->prepare();
+		w_titlebar.next = &w_about_button1;
+		prepare_widgets();
 		draw();
 	}
 }

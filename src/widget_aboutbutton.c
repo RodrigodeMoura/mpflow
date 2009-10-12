@@ -4,6 +4,7 @@
 
 #include "widget_aboutbutton.h"
 #include "widget_about.h"
+#include "widget_titlebar.h"
 #include "widget_covers.h"
 #include "SDK.h"
 #include "main.h"
@@ -15,7 +16,6 @@
 Widget w_about_button1, w_about_button2;
 
 
-static void prepare_button(void);
 static void click_button(int, int, int);
 
 void init_widget_aboutbutton(void) {
@@ -26,7 +26,6 @@ void init_widget_aboutbutton(void) {
 	w_about_button1.w = screen_width / 10;
 	w_about_button1.h = screen_height / 10;
 
-	w_about_button1.prepare = prepare_button;
 	w_about_button1.click_event = click_button;
 
 	w_about_button1.next = &w_about_button2;
@@ -36,20 +35,15 @@ void init_widget_aboutbutton(void) {
 	w_about_button2.w = w_about_button1.w;
 	w_about_button2.h = w_about_button1.h;
 
-	w_about_button2.prepare = prepare_button;
 	w_about_button2.click_event = click_button;
 
 	w_about_button2.next = &w_covers;
 }
 
-static void prepare_button(void) {
-	w_covers.prepare();
-}
-
 static void click_button(int button, int x, int y) {
 	if (button & (SDK_MOUSE_LEFT|SDK_MOUSE_RIGHT)) {
-		main_widget = &w_about;
-		main_widget->prepare();
+		w_titlebar.next = &w_about;
+		prepare_widgets();
 		draw();
 	}
 }

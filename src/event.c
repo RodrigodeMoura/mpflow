@@ -161,6 +161,10 @@ void mouse_event(SDK_Event event, int buttons, int x, int y) {
 				lpress_x = x;
 				lpress_y = y;
 				lpress_time = SDK_ticks();
+
+				get_abs_mouse(&drag_x, &drag_y);
+				orig_x = x;
+				orig_y = y;
 			}
 			if (buttons & SDK_MOUSE_RIGHT) {
 				rpress_x = x;
@@ -171,39 +175,45 @@ void mouse_event(SDK_Event event, int buttons, int x, int y) {
 			if (buttons & (SDK_MOUSE_WHEELUP|SDK_MOUSE_WHEELDOWN))
 				mouse_widgets(event, buttons, x, y);
 
-#ifdef OLDCODE
-/* window drag at "title border" */
-			if (y <= screen_height / 8) {			/* top of window activates window drag */
-				window_drag = 1;
-				get_abs_mouse(&drag_x, &drag_y);
-				orig_x = drag_x;
-				orig_y = drag_y;
-				dir_x = dir_y = dir_x_change = dir_y_change = 0;
-			}
-#endif
 			break;
 
 		case SDK_RELEASE:
 			window_drag = mouse_drag = 0;
-			key_down = 0;
 
 			if (buttons & SDK_MOUSE_LEFT) {
 				lpress_time = SDK_ticks() - lpress_time;
 				if (abs(lpress_x - x) <= 2 && abs(lpress_y - y) <= 2 && lpress_time <= MOUSE_CLICK) {
+					lpress_time = 0;
 					click_widgets(SDK_MOUSE_LEFT, x, y);
 					break;
 				}
+				lpress_time = 0;
 			}
 			if (buttons & SDK_MOUSE_RIGHT) {
 				rpress_time = SDK_ticks() - rpress_time;
 				if (abs(rpress_x - x) <= 2 && abs(rpress_y - y) <= 2 && rpress_time <= MOUSE_CLICK) {
+					rpress_time = 0;
 					click_widgets(SDK_MOUSE_RIGHT, x, y);
 					break;
 				}
+				rpress_time = 0;
 			}
 			break;
 
 		case SDK_MOUSEMOVE:
+			if (lpress_time) {
+				int new_x, new_y;
+
+				get_abs_mouse(&new_x, &new_y);
+
+				drag_widgets(orig_x, orig_y, new_x - drag_x, new_y - drag_y);
+
+				drag_x = new_x;
+				drag_y = new_y;
+			}
+
+#ifdef OLD_CODE
+/* dit is voor window shake */
 			if (window_drag) {
 				int new_x, new_y;
 
@@ -232,12 +242,8 @@ void mouse_event(SDK_Event event, int buttons, int x, int y) {
 						dir_y = 1;
 					}
 				}
-
-/* drag window to new position */
-				move_app_window(window_x + (new_x - drag_x), window_y + (new_y - drag_y));
-				drag_x = new_x;
-				drag_y = new_y;
 			}
+#endif
 			break;
 
 		default:

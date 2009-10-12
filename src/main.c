@@ -17,6 +17,7 @@
 #include "widget_covers.h"
 #include "widget_about.h"
 #include "widget_aboutbutton.h"
+#include "widget_titlebar.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -307,9 +308,10 @@ int main(int argc, char *argv[]) {
 	init_widget_covers();
 	init_widget_about();
 	init_widget_aboutbutton();
+	init_widget_titlebar();
 
-	main_widget = &w_about_button1;
-	main_widget->prepare();
+	main_widget = &w_titlebar;
+	prepare_widgets();
 	draw();
 
 	for(;;) {
