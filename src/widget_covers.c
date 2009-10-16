@@ -104,15 +104,20 @@ static void mouse_covers(int event, int buttons, int x, int y) {
 				moving = MOVE_LEFT;
 				ticks_moving = SDK_ticks();
 			}
-			scroll_wheel++;
-printf("TD scroll_wheel == %d\n", scroll_wheel);
+			if (moving == MOVE_RIGHT)
+				scroll_wheel = 0;
+			else
+				scroll_wheel++;
 		}
 		if (buttons & SDK_MOUSE_WHEELDOWN) {
 			if (!moving) {
 				moving = MOVE_RIGHT;
 				ticks_moving = SDK_ticks();
 			}
-			scroll_wheel++;
+			if (moving == MOVE_LEFT)
+				scroll_wheel = 0;
+			else
+				scroll_wheel++;
 		}
 	}
 }
