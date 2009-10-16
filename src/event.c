@@ -51,61 +51,6 @@ void key_event(SDK_Event state, int key) {
 		key_down = 0;
 }
 
-void move(void) {
-	if (!moving) {
-		switch(key_down) {
-			case SDK_LEFT:
-				moving = MOVE_LEFT;
-				ticks_moving = SDK_ticks();
-				break;
-
-			case SDK_RIGHT:
-				moving = MOVE_RIGHT;
-				ticks_moving = SDK_ticks();
-				break;
-
-			default:
-				;
-		}
-	}
-	switch(moving) {
-		case MOVE_LEFT:
-			move_covers_left();
-			draw();
-			break;
-
-		case MOVE_RIGHT:
-			move_covers_right();
-			draw();
-			break;
-
-		default:
-			;
-	}
-/* moving may have been reset */
-	if (!moving) {
-		if (scroll_wheel > 0) {
-			scroll_wheel--;
-			if (!scroll_wheel) {
-				key_down = 0;
-				return;
-			}
-		}
-		switch(key_down) {
-			case SDK_LEFT:
-				moving = MOVE_LEFT;
-				break;
-
-			case SDK_RIGHT:
-				moving = MOVE_RIGHT;
-				break;
-
-			default:
-				;
-		}
-	}
-}
-
 /*
 	see if a mouse click was in a particular area
 */

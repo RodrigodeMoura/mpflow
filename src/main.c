@@ -316,7 +316,7 @@ int main(int argc, char *argv[]) {
 
 	for(;;) {
 		SDK_handle_events();
-		move();
+		move_covers();
 
 		if (!moving)
 			SDL_WaitEvent(NULL);

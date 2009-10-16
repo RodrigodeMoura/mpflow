@@ -10,6 +10,7 @@
 extern Widget w_covers;
 
 void init_widget_covers(void);
+void move_covers(void);
 
 #endif	/* WIDGET_COVERS_H_WJ109 */
 

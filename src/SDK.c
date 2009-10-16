@@ -304,15 +304,15 @@ SDL_Event event;
 
 			case SDL_MOUSEBUTTONDOWN:
 				if (mouse_events != NULL) {
-					mouse_buttons = mouse_button_bit(event.button.button);
-					mouse_events(SDK_PRESS, mouse_buttons, mouse_x, mouse_y);
+					mouse_buttons |= mouse_button_bit(event.button.button);
+					mouse_events(SDK_PRESS, mouse_button_bit(event.button.button), mouse_x, mouse_y);
 				}
 				break;
 
 			case SDL_MOUSEBUTTONUP:
 				if (mouse_events != NULL) {
-					mouse_buttons = mouse_button_bit(event.button.button);
-					mouse_events(SDK_RELEASE, mouse_buttons, mouse_x, mouse_y);
+					mouse_buttons &= ~mouse_button_bit(event.button.button);
+					mouse_events(SDK_RELEASE, mouse_button_bit(event.button.button), mouse_x, mouse_y);
 				}
 				break;
 

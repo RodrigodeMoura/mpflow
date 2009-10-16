@@ -137,4 +137,81 @@ static void click_covers(int button, int x, int y) {
 	}
 }
 
+void move_covers(void) {
+int buttons, x, y;
+
+	if (!moving) {
+		ticks_moving = 0;
+
+		switch(key_down) {
+			case SDK_LEFT:
+				moving = MOVE_LEFT;
+				break;
+
+			case SDK_RIGHT:
+				moving = MOVE_RIGHT;
+				break;
+
+			default:
+				SDK_get_mouse(&buttons, &x, &y);
+
+				if (buttons & SDK_MOUSE_LEFT) {
+					scroll_wheel = 0;
+					key_down = 0;
+
+					if (click_rect(&left_side, x, y))
+						moving = MOVE_RIGHT;
+					else
+						if (click_rect(&right_side, x, y))
+							moving = MOVE_LEFT;
+				}
+		}
+		if (moving)
+			ticks_moving = SDK_ticks();
+	}
+	switch(moving) {
+		case MOVE_LEFT:
+			move_covers_left();
+			draw();
+			break;
+
+		case MOVE_RIGHT:
+			move_covers_right();
+			draw();
+			break;
+
+		default:
+			;
+	}
+	if (!moving) {
+/*
+	moving may have been reset
+	do exactly the same as above, but without resetting 'ticks_moving'
+*/
+		switch(key_down) {
+			case SDK_LEFT:
+				moving = MOVE_LEFT;
+				break;
+
+			case SDK_RIGHT:
+				moving = MOVE_RIGHT;
+				break;
+
+			default:
+				SDK_get_mouse(&buttons, &x, &y);
+
+				if (buttons & SDK_MOUSE_LEFT) {
+					scroll_wheel = 0;
+					key_down = 0;
+
+					if (click_rect(&left_side, x, y))
+						moving = MOVE_RIGHT;
+					else
+						if (click_rect(&right_side, x, y))
+							moving = MOVE_LEFT;
+				}
+		}
+	}
+}
+
 /* EOB */
