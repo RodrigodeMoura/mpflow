@@ -13,13 +13,18 @@
 
 Widget w_covers;
 
-static unsigned int center_clicked = 0;
+static unsigned int center_clicked;
 static SDL_Rect left_side, right_side;
+
+int moving;
+unsigned int ticks_moving;
+
 
 static void prepare_covers(void);
 static int input_covers(int);
 static void mouse_covers(int, int, int, int);
 static void click_covers(int, int, int);
+
 
 void init_widget_covers(void) {
 	memset(&w_covers, 0, sizeof(Widget));
@@ -48,6 +53,11 @@ void init_widget_covers(void) {
 	right_side.y = center_cover.y;
 	right_side.w = screen_width - right_side.x;
 	right_side.h = center_cover.h;
+
+	center_clicked = 0;
+
+	moving = 0;
+	ticks_moving = 0;
 }
 
 static void prepare_covers(void) {

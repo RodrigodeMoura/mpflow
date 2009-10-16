@@ -21,14 +21,11 @@
 
 
 int key_down = 0;
-int moving = 0;
 int scroll_wheel = 0;
-unsigned int ticks_moving;
 
-static int mouse_drag, window_drag, drag_x, drag_y, orig_x, orig_y;
+static int drag_x, drag_y, orig_x, orig_y;
 static int lpress_x, lpress_y, rpress_x, rpress_y;
 static unsigned int lpress_time = 0, rpress_time = 0;
-static int dir_x, dir_y, dir_x_change, dir_y_change;
 
 
 void jump_to_cover(int key) {
@@ -100,6 +97,9 @@ SDL_SysWMinfo info;
 	Window dragging is now rock solid :)
 */
 void mouse_event(SDK_Event event, int buttons, int x, int y) {
+	if (event != SDK_MOUSEMOVE)
+		mouse_widgets(event, buttons, x, y);
+
 	switch(event) {
 		case SDK_PRESS:
 			if (buttons & SDK_MOUSE_LEFT) {
@@ -116,15 +116,9 @@ void mouse_event(SDK_Event event, int buttons, int x, int y) {
 				rpress_y = y;
 				rpress_time = SDK_ticks();
 			}
-/* pass on scroll wheel events */
-			if (buttons & (SDK_MOUSE_WHEELUP|SDK_MOUSE_WHEELDOWN))
-				mouse_widgets(event, buttons, x, y);
-
 			break;
 
 		case SDK_RELEASE:
-			window_drag = mouse_drag = 0;
-
 			if (buttons & SDK_MOUSE_LEFT) {
 				lpress_time = SDK_ticks() - lpress_time;
 				if (abs(lpress_x - x) <= 2 && abs(lpress_y - y) <= 2 && lpress_time <= MOUSE_CLICK) {
@@ -156,39 +150,6 @@ void mouse_event(SDK_Event event, int buttons, int x, int y) {
 				drag_x = new_x;
 				drag_y = new_y;
 			}
-
-#ifdef OLD_CODE
-/* dit is voor window shake */
-			if (window_drag) {
-				int new_x, new_y;
-
-				get_abs_mouse(&new_x, &new_y);
-
-/* keep stats about directional changes for detecting 'window shake' */
-				if (new_x - orig_x < 0) {
-					if (dir_x >= 0)
-						dir_x_change++;
-					dir_x = -1;
-				} else {
-					if (new_x - orig_x > 0) {
-						if (dir_x <= 0)
-							dir_x_change++;
-						dir_x = 1;
-					}
-				}
-				if (new_y - orig_y < 0) {
-					if (dir_y >= 0)
-						dir_y_change++;
-					dir_y = -1;
-				} else {
-					if (new_y - orig_y > 0) {
-						if (dir_y <= 0)
-							dir_y_change++;
-						dir_y = 1;
-					}
-				}
-			}
-#endif
 			break;
 
 		default:
@@ -213,10 +174,6 @@ void window_event(SDK_Event event, int w, int h) {
 
 void init_events(void) {
 	key_down = 0;
-	moving = 0;
-	ticks_moving = 0;
-
-	mouse_drag = window_drag = 0;
 
 	SDK_key_event(key_event);
 	SDK_mouse_event(mouse_event);

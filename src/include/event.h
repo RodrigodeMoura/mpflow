@@ -12,12 +12,9 @@
 
 #define MOUSE_CLICK			350		/* time in milliseconds */
 #define MOUSE_DOUBLECLICK	600		/* time in milliseconds */
-#define WINDOW_SHAKE		5
 
 extern int key_down;
-extern int moving;
 extern int scroll_wheel;
-extern unsigned int ticks_moving;
 
 void init_events(void);
 void move(void);

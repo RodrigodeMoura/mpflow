@@ -7,6 +7,9 @@
 
 #include "widget.h"
 
+#define SHAKE_INTERVAL	1000
+#define WINDOW_SHAKE	6
+
 extern Widget w_titlebar;
 
 void init_widget_titlebar(void);

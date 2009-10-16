@@ -8,6 +8,8 @@
 #include "widget.h"
 
 extern Widget w_covers;
+extern int moving;
+extern unsigned int ticks_moving;
 
 void init_widget_covers(void);
 void move_covers(void);
