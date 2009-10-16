@@ -4,6 +4,11 @@
 #	mpflow Copyright (c) 2009 by Walter de Jong <walter@heiho.net>
 #
 
+PREFIX=/usr
+BINDIR=$(PREFIX)/bin
+
+INSTALL=install
+
 Q = @
 OBJDIR = obj
 
@@ -67,5 +72,8 @@ mrproper: clean
 depend dep .depend:
 	@echo '  DEP       .depend'
 	$(Q)$(CC) -I$(INCLUDE) -M $(CFILES) > .depend
+
+install: mpflow
+	$(INSTALL) -m 0755 -s mpflow $(BINDIR)
 
 # EOB
