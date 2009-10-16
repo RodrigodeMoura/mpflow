@@ -25,7 +25,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#define VERSION		"0.9.1"
+#define VERSION		"0.9.2"
 
 
 int screen_width = 600;					/* current display resolution (or window size) */
