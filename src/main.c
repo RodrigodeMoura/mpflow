@@ -21,6 +21,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 #define VERSION		"0.9.1"
 
@@ -238,6 +241,28 @@ void draw_startup(void) {
 	SDK_swapbuffers();
 }
 
+/*
+	get lock on lock file
+*/
+int lock_program(void) {
+int fd;
+struct flock lock;
+
+	if ((fd = open("/var/lock/mpflow.lock", O_WRONLY|O_CREAT, 0644)) == -1)
+		return -1;
+
+	lock.l_type = F_WRLCK;
+	lock.l_whence = SEEK_SET;
+	lock.l_start = 0;
+	lock.l_len = 1;
+
+	if (fcntl(fd, F_SETLK, &lock) == -1)
+		return -1;
+
+/* fd remains open */
+	return 0;
+}
+
 void get_options(int argc, char *argv[]) {
 int i;
 
@@ -288,6 +313,10 @@ int main(int argc, char *argv[]) {
 	printf("mpflow - Copyright (C) 2009 Walter de Jong <walter@heiho.net>\n");
 	get_options(argc, argv);
 
+	if (lock_program() == -1) {
+		printf("another instance of mpflow is already running\n");
+		return 1;
+	}
 	init_mpd();
 
 /* init app */
