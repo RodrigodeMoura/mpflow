@@ -14,7 +14,6 @@
 #define MOUSE_DOUBLECLICK	600		/* time in milliseconds */
 
 extern int key_down;
-extern int scroll_wheel;
 
 void init_events(void);
 void move(void);

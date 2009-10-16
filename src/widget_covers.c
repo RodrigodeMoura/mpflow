@@ -15,6 +15,7 @@ Widget w_covers;
 
 static unsigned int center_clicked;
 static SDL_Rect left_side, right_side;
+static int scroll_wheel;
 
 int moving;
 unsigned int ticks_moving;
@@ -58,6 +59,7 @@ void init_widget_covers(void) {
 
 	moving = 0;
 	ticks_moving = 0;
+	scroll_wheel = 0;
 }
 
 static void prepare_covers(void) {
@@ -98,20 +100,19 @@ static void mouse_covers(int event, int buttons, int x, int y) {
 	if (event == SDK_PRESS) {
 /* use mouse wheel to scroll */
 		if (buttons & SDK_MOUSE_WHEELUP) {
-			if (key_down != SDK_RIGHT)
-				scroll_wheel++;
-
-			key_down = SDK_LEFT;
-			moving = MOVE_RIGHT;
-			ticks_moving = SDK_ticks();
+			if (!moving) {
+				moving = MOVE_LEFT;
+				ticks_moving = SDK_ticks();
+			}
+			scroll_wheel++;
+printf("TD scroll_wheel == %d\n", scroll_wheel);
 		}
 		if (buttons & SDK_MOUSE_WHEELDOWN) {
-			if (key_down != SDK_LEFT)
-				scroll_wheel++;
-
-			key_down = SDK_RIGHT;
-			moving = MOVE_LEFT;
-			ticks_moving = SDK_ticks();
+			if (!moving) {
+				moving = MOVE_RIGHT;
+				ticks_moving = SDK_ticks();
+			}
+			scroll_wheel++;
 		}
 	}
 }
@@ -148,7 +149,9 @@ static void click_covers(int button, int x, int y) {
 }
 
 void move_covers(void) {
-int buttons, x, y;
+int buttons, x, y, was_moving;
+
+	was_moving = moving;
 
 	if (!moving) {
 		ticks_moving = 0;
@@ -194,6 +197,11 @@ int buttons, x, y;
 			;
 	}
 	if (!moving) {
+		if (scroll_wheel > 0) {
+			scroll_wheel--;
+			if (scroll_wheel > 0)
+				moving = was_moving;
+		}
 /*
 	moving may have been reset
 	do exactly the same as above, but without resetting 'ticks_moving'

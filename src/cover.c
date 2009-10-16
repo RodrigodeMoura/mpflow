@@ -10,6 +10,7 @@
 #include "texture.h"
 #include "text.h"
 #include "font.h"
+#include "widget_covers.h"
 
 #include <stdio.h>
 #include <stdlib.h>

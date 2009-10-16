@@ -21,7 +21,6 @@
 
 
 int key_down = 0;
-int scroll_wheel = 0;
 
 static int drag_x, drag_y, orig_x, orig_y;
 static int lpress_x, lpress_y, rpress_x, rpress_y;
