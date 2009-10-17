@@ -6,6 +6,7 @@
 #include "widget_aboutbutton.h"
 #include "main.h"
 #include "SDK.h"
+#include "mpd.h"
 
 #include <stdio.h>
 #include <stdlib.h>

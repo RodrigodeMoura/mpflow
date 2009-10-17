@@ -23,6 +23,7 @@ struct Widget_tag {
 extern Widget *main_widget;
 
 int init_widgets(void);
+void prepare_widgets(void);
 void draw_widgets(void);
 void input_widgets(int);
 void mouse_widgets(int, int, int, int);

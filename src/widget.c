@@ -11,7 +11,7 @@ Widget *main_widget = NULL;
 
 
 int init_widgets(void) {
-	;
+	return 0;
 }
 
 void prepare_widgets(void) {

@@ -7,6 +7,8 @@
 #include "mpd.h"
 #include "SDK.h"
 #include "event.h"
+#include "text.h"
+#include "texture.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -65,6 +67,18 @@ void init_widget_covers(void) {
 static void prepare_covers(void) {
 	clear_text();
 	reset_cover_title_text();
+}
+
+static void jump_to_cover(int key) {
+	if (jump_cover(key) == -1)
+		return;
+
+	set_cover_dirlist();
+	delete_textures(NUM_COVER_TEXTURES);
+	create_textures(NUM_COVER_TEXTURES);
+	load_cover_textures();
+
+	draw();
 }
 
 static int input_covers(int key) {

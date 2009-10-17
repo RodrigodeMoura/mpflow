@@ -27,18 +27,6 @@ static int lpress_x, lpress_y, rpress_x, rpress_y;
 static unsigned int lpress_time = 0, rpress_time = 0;
 
 
-void jump_to_cover(int key) {
-	if (jump_cover(key) == -1)
-		return;
-
-	set_cover_dirlist();
-	delete_textures(NUM_COVER_TEXTURES);
-	create_textures(NUM_COVER_TEXTURES);
-	load_cover_textures();
-
-	draw();
-}
-
 void key_event(SDK_Event state, int key) {
 	if (state == SDK_PRESS) {
 		key_down = key;

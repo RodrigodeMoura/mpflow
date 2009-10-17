@@ -18,15 +18,15 @@ CC = gcc
 #
 #	Debug version
 #
-##CFLAGS = -g -Wall -Wstrict-prototypes
-##LFLAGS = -lSDL -lSDL_image -lSDL_gfx -lGL -lGLU
+CFLAGS = -g -Wall -Wstrict-prototypes
+LFLAGS = -lSDL -lSDL_image -lSDL_gfx -lGL -lGLU
 
 ###
 #
 #	Production version
 #
-CFLAGS = -s -O2
-LFLAGS = -lSDL -lSDL_image -lSDL_gfx -lGL -lGLU
+##CFLAGS = -s -O2
+##LFLAGS = -lSDL -lSDL_image -lSDL_gfx -lGL -lGLU
 
 INCLUDE = include -I/usr/include/SDL -I/usr/include/GL
 
